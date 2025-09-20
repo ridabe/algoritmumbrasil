@@ -40,7 +40,6 @@ export async function middleware(request: NextRequest) {
   
   // Rotas públicas que não precisam de autenticação
   const publicRoutes = ['/auth/login', '/auth/register', '/']
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
   
   // Rotas protegidas que precisam de autenticação
   const protectedRoutes = ['/financas']

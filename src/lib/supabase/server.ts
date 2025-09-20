@@ -50,7 +50,7 @@ export function createMiddlewareClient(request: Request) {
               return { name, value };
             }) ?? [];
         },
-        setAll(cookiesToSet) {
+        setAll() {
           // Middleware não pode definir cookies diretamente
           // Isso será tratado pela resposta do middleware
         },

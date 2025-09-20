@@ -103,7 +103,7 @@ export default function TransacoesPage() {
 
   // Hooks para dados
   const { transactions, loading, deleteTransaction } = useTransactions();
-  const { data: summary } = useTransactionsSummary();
+  const { summary } = useTransactionsSummary();
 
   // Filtrar transações baseado na busca e filtro
   const filteredTransactions = transactions?.filter(transaction => {
@@ -114,7 +114,7 @@ export default function TransacoesPage() {
 
   // Usar dados do resumo ou calcular localmente
   const totalIncome = summary?.total_income || 0;
-  const totalExpenses = summary?.total_expenses || 0;
+  const totalExpenses = summary?.total_expense || 0;
   const balance = totalIncome - totalExpenses;
 
   /**
@@ -138,7 +138,7 @@ export default function TransacoesPage() {
    */
   const handleDeleteTransaction = async (id: string) => {
     try {
-      await deleteTransaction.mutateAsync(id);
+      await deleteTransaction(id);
       toast.success('Transação excluída com sucesso!');
     } catch (error) {
       console.error('Erro ao excluir transação:', error);
@@ -371,8 +371,8 @@ export default function TransacoesPage() {
 
       {/* Modal de Transação */}
       <TransactionModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        open={isModalOpen}
+        onOpenChange={(open) => !open && handleCloseModal()}
         transaction={editingTransaction}
       />
     </div>

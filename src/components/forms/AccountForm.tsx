@@ -38,9 +38,7 @@ import type { Account, CreateAccountData, UpdateAccountData } from '@/lib/types/
 const accountFormSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório').max(100, 'Nome muito longo'),
   bank: z.string().min(1, 'Banco é obrigatório').max(100, 'Nome do banco muito longo'),
-  type: z.nativeEnum(AccountType, {
-    errorMap: () => ({ message: 'Tipo de conta é obrigatório' })
-  }),
+  type: z.nativeEnum(AccountType),
   balance: z.number().min(-999999999, 'Saldo inválido').max(999999999, 'Saldo muito alto'),
   currency: z.nativeEnum(Currency).default(Currency.BRL),
   account_number: z.string().optional(),
