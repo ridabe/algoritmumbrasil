@@ -6,10 +6,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Search, Filter, Download, Eye, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, MoreHorizontal, ArrowUpDown, TrendingUp, TrendingDown, DollarSign, Edit, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -23,100 +25,145 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-// Dados mockados para demonstração
-const mockTransactions = [
-  {
-    id: '1',
-    date: '2024-01-15',
-    description: 'Salário Janeiro',
-    category: 'Salário',
-    account: 'Conta Corrente',
-    type: 'income' as const,
-    amount: 5000.00,
-    status: 'completed' as const,
-  },
-  {
-    id: '2',
-    date: '2024-01-14',
-    description: 'Supermercado',
-    category: 'Alimentação',
-    account: 'Cartão de Crédito',
-    type: 'expense' as const,
-    amount: 250.80,
-    status: 'completed' as const,
-  },
-  {
-    id: '3',
-    date: '2024-01-13',
-    description: 'Freelance Design',
-    category: 'Freelance',
-    account: 'Conta Poupança',
-    type: 'income' as const,
-    amount: 800.00,
-    status: 'pending' as const,
-  },
-  {
-    id: '4',
-    date: '2024-01-12',
-    description: 'Aluguel',
-    category: 'Moradia',
-    account: 'Conta Corrente',
-    type: 'expense' as const,
-    amount: 1200.00,
-    status: 'completed' as const,
-  },
-  {
-    id: '5',
-    date: '2024-01-11',
-    description: 'Gasolina',
-    category: 'Transporte',
-    account: 'Cartão de Débito',
-    type: 'expense' as const,
-    amount: 120.00,
-    status: 'completed' as const,
-  },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { TransactionModal } from '@/components/modals/TransactionModal';
+import { useTransactions, useTransactionsSummary } from '@/hooks/useTransactions';
+import {
+  Transaction,
+  TransactionType,
+  PaymentMethod,
+  TRANSACTION_TYPE_LABELS,
+  PAYMENT_METHOD_LABELS
+} from '@/lib/types/transactions';
 
 /**
- * Formata valor monetário para exibição
+ * Formata valor monetário
  */
-function formatCurrency(value: number): string {
+const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
-    currency: 'BRL',
+    currency: 'BRL'
   }).format(value);
-}
+};
 
 /**
- * Formata data para exibição
+ * Formata data
  */
-function formatDate(date: string): string {
-  return new Intl.DateTimeFormat('pt-BR').format(new Date(date));
-}
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('pt-BR');
+};
+
+/**
+ * Obtém cor da badge baseada no tipo
+ */
+const getTypeColor = (type: TransactionType) => {
+  switch (type) {
+    case TransactionType.INCOME:
+      return 'bg-green-100 text-green-800 hover:bg-green-200';
+    case TransactionType.EXPENSE:
+      return 'bg-red-100 text-red-800 hover:bg-red-200';
+    case TransactionType.TRANSFER:
+      return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+    default:
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+  }
+};
+
+/**
+ * Obtém cor do valor baseada no tipo
+ */
+const getAmountColor = (type: TransactionType) => {
+  switch (type) {
+    case TransactionType.INCOME:
+      return 'text-green-600 font-semibold';
+    case TransactionType.EXPENSE:
+      return 'text-red-600 font-semibold';
+    case TransactionType.TRANSFER:
+      return 'text-blue-600 font-semibold';
+    default:
+      return 'text-gray-600';
+  }
+};
 
 export default function TransacoesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState<'all' | 'income' | 'expense'>('all');
+  const [filterType, setFilterType] = useState<'all' | TransactionType>('all');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
 
-  // Filtrar transações baseado na busca e tipo
-  const filteredTransactions = mockTransactions.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === 'all' || transaction.type === selectedType;
-    return matchesSearch && matchesType;
-  });
+  // Hooks para dados
+  const { transactions, isLoading, deleteTransaction } = useTransactions();
+  const { data: summary } = useTransactionsSummary();
 
-  // Calcular totais
-  const totalIncome = filteredTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  const totalExpense = filteredTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
+  // Filtrar transações baseado na busca e filtro
+  const filteredTransactions = transactions?.filter(transaction => {
+    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === 'all' || transaction.type === filterType;
+    return matchesSearch && matchesFilter;
+  }) || [];
+
+  // Usar dados do resumo ou calcular localmente
+  const totalIncome = summary?.total_income || 0;
+  const totalExpenses = summary?.total_expenses || 0;
+  const balance = totalIncome - totalExpenses;
+
+  /**
+   * Abre modal para nova transação
+   */
+  const handleNewTransaction = () => {
+    setEditingTransaction(undefined);
+    setIsModalOpen(true);
+  };
+
+  /**
+   * Abre modal para editar transação
+   */
+  const handleEditTransaction = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
+  /**
+   * Exclui uma transação
+   */
+  const handleDeleteTransaction = async (id: string) => {
+    try {
+      await deleteTransaction.mutateAsync(id);
+      toast.success('Transação excluída com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir transação:', error);
+      toast.error('Erro ao excluir transação. Tente novamente.');
+    }
+  };
+
+  /**
+   * Fecha o modal
+   */
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(undefined);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Carregando transações...</p>
+          </div>
+        </div>
+      </div>
 
   return (
     <div className="space-y-6">
@@ -125,11 +172,11 @@ export default function TransacoesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Transações</h1>
           <p className="text-muted-foreground">
-            Gerencie todas as suas transações financeiras
+            Gerencie suas receitas, despesas e transferências
           </p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+        <Button onClick={handleNewTransaction} className="w-full sm:w-auto">
+          <Plus className="mr-2 h-4 w-4" />
           Nova Transação
         </Button>
       </div>
@@ -138,34 +185,46 @@ export default function TransacoesPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Receitas</CardTitle>
+            <CardTitle className="text-sm font-medium">Receitas</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(totalIncome)}
             </div>
+            <p className="text-xs text-muted-foreground">
+              Total de receitas do período
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Despesas</CardTitle>
+            <CardTitle className="text-sm font-medium">Despesas</CardTitle>
+            <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {formatCurrency(totalExpense)}
+              {formatCurrency(totalExpenses)}
             </div>
+            <p className="text-xs text-muted-foreground">
+              Total de despesas do período
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Saldo Líquido</CardTitle>
+            <CardTitle className="text-sm font-medium">Saldo</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${
-              totalIncome - totalExpense >= 0 ? 'text-green-600' : 'text-red-600'
+              balance >= 0 ? 'text-green-600' : 'text-red-600'
             }`}>
-              {formatCurrency(totalIncome - totalExpense)}
+              {formatCurrency(balance)}
             </div>
+            <p className="text-xs text-muted-foreground">
+              Saldo atual do período
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -187,33 +246,36 @@ export default function TransacoesPage() {
             </div>
             <div className="flex gap-2">
               <Button
-                variant={selectedType === 'all' ? 'default' : 'outline'}
-                onClick={() => setSelectedType('all')}
+                variant={filterType === 'all' ? 'default' : 'outline'}
+                onClick={() => setFilterType('all')}
                 size="sm"
               >
                 Todas
               </Button>
               <Button
-                variant={selectedType === 'income' ? 'default' : 'outline'}
-                onClick={() => setSelectedType('income')}
+                variant={filterType === TransactionType.INCOME ? 'default' : 'outline'}
+                onClick={() => setFilterType(TransactionType.INCOME)}
                 size="sm"
               >
                 Receitas
               </Button>
               <Button
-                variant={selectedType === 'expense' ? 'default' : 'outline'}
-                onClick={() => setSelectedType('expense')}
+                variant={filterType === TransactionType.EXPENSE ? 'default' : 'outline'}
+                onClick={() => setFilterType(TransactionType.EXPENSE)}
                 size="sm"
               >
                 Despesas
               </Button>
+              <Button
+                variant={filterType === TransactionType.TRANSFER ? 'default' : 'outline'}
+                onClick={() => setFilterType(TransactionType.TRANSFER)}
+                size="sm"
+              >
+                Transferências
+              </Button>
               <Button variant="outline" size="sm">
                 <Filter className="h-4 w-4 mr-2" />
                 Filtros
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Exportar
               </Button>
             </div>
           </div>
@@ -224,6 +286,9 @@ export default function TransacoesPage() {
       <Card>
         <CardHeader>
           <CardTitle>Transações Recentes</CardTitle>
+          <CardDescription>
+            {filteredTransactions.length} transação(ões) encontrada(s)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -233,59 +298,58 @@ export default function TransacoesPage() {
                 <TableHead>Descrição</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Conta</TableHead>
+                <TableHead>Método</TableHead>
                 <TableHead>Tipo</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[70px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredTransactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell>{formatDate(transaction.date)}</TableCell>
                   <TableCell className="font-medium">
-                    {transaction.description}
+                    {formatDate(transaction.transaction_date)}
                   </TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell>{transaction.account}</TableCell>
+                  <TableCell>{transaction.description}</TableCell>
+                  <TableCell>{transaction.category_id}</TableCell>
+                  <TableCell>{transaction.account_id}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={transaction.type === 'income' ? 'default' : 'destructive'}
-                    >
-                      {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                    <Badge variant="outline">
+                      {PAYMENT_METHOD_LABELS[transaction.payment_method]}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={transaction.status === 'completed' ? 'default' : 'secondary'}
+                    <Badge 
+                      variant="secondary"
+                      className={getTypeColor(transaction.type)}
                     >
-                      {transaction.status === 'completed' ? 'Concluída' : 'Pendente'}
+                      {TRANSACTION_TYPE_LABELS[transaction.type]}
                     </Badge>
                   </TableCell>
-                  <TableCell className={`text-right font-medium ${
-                    transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {transaction.type === 'income' ? '+' : '-'}
+                  <TableCell className={`text-right font-semibold ${getAmountColor(transaction.type)}`}>
+                    {transaction.type === TransactionType.EXPENSE ? '-' : '+'}
                     {formatCurrency(transaction.amount)}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          •••
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Abrir menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          Visualizar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleEditTransaction(transaction)}>
+                          <Edit className="mr-2 h-4 w-4" />
                           Editar
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="h-4 w-4 mr-2" />
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem 
+                          className="text-red-600"
+                          onClick={() => handleDeleteTransaction(transaction.id)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
                           Excluir
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -295,8 +359,20 @@ export default function TransacoesPage() {
               ))}
             </TableBody>
           </Table>
+          {filteredTransactions.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Nenhuma transação encontrada.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Modal de Transação */}
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        transaction={editingTransaction}
+      />
     </div>
   );
 }

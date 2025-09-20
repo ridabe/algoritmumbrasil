@@ -32,10 +32,7 @@ validateEnvironmentVariables();
 
 const nextConfig: NextConfig = {
   // Configurações para melhor performance e compatibilidade
-  experimental: {
-    // Otimizações para Server Components
-    serverComponentsExternalPackages: ['@supabase/ssr']
-  },
+  serverExternalPackages: ['@supabase/ssr'],
   
   // Configuração de imagens para Supabase Storage
   images: {
