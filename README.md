@@ -1,144 +1,36 @@
-# AlgoritmumBrasil - Landing Page
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## 📋 Sobre o Projeto
+## Getting Started
 
-Landing page profissional da **AlgoritmumBrasil**, empresa especializada em desenvolvimento de sistemas, soluções de inteligência artificial e consultoria tecnológica.
+First, run the development server:
 
-## 🚀 Características
-
-- **Design Responsivo**: Adaptado para desktop, tablet e dispositivos móveis
-- **Tema Profissional**: Paleta de cores azul com gradientes modernos
-- **Animações Suaves**: Transições e efeitos visuais elegantes
-- **Performance Otimizada**: Código limpo e otimizado para carregamento rápido
-- **SEO Friendly**: Estrutura semântica e meta tags otimizadas
-
-## 🛠️ Tecnologias Utilizadas
-
-- **HTML5**: Estrutura semântica e acessível
-- **CSS3**: Estilos modernos com Flexbox e Grid
-- **JavaScript**: Interatividade e animações
-- **SVG**: Logo vetorial escalável
-
-## 📁 Estrutura do Projeto
-
-```
-algoritmumbrasil/
-├── index.html          # Página principal
-├── styles.css          # Estilos CSS
-├── script.js           # JavaScript
-├── images/
-│   └── logo.svg        # Logo da empresa
-└── README.md           # Documentação
-```
-
-## 🎨 Seções da Landing Page
-
-### 1. **Header**
-- Logo da empresa
-- Menu de navegação responsivo
-- Menu hambúrguer para mobile
-
-### 2. **Hero Section**
-- Apresentação impactante da empresa
-- Call-to-action principal
-- Efeito parallax sutil
-
-### 3. **Serviços**
-- **Desenvolvimento de Sistemas**: Soluções personalizadas
-- **Inteligência Artificial**: Implementação de IA
-- **Consultoria Tecnológica**: Assessoria especializada
-
-### 4. **Sobre a Empresa**
-- Estatísticas e números
-- Diferenciais competitivos
-- Contadores animados
-
-### 5. **Contato**
-- Formulário de contato funcional
-- Validação de campos
-- Notificações de sucesso/erro
-
-### 6. **Footer**
-- Links úteis
-- Redes sociais
-- Informações de contato
-
-## 🚀 Como Executar
-
-### Opção 1: Servidor Local Python
 ```bash
-# Navegue até a pasta do projeto
-cd algoritmumbrasil
-
-# Inicie o servidor HTTP
-python -m http.server 8000
-
-# Acesse no navegador
-http://localhost:8000
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### Opção 2: Live Server (VS Code)
-1. Instale a extensão "Live Server" no VS Code
-2. Clique com o botão direito no arquivo `index.html`
-3. Selecione "Open with Live Server"
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Opção 3: Servidor Web
-- Faça upload dos arquivos para seu servidor web
-- Acesse através do domínio configurado
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 📱 Responsividade
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-- **Desktop**: Layout completo com todas as funcionalidades
-- **Tablet**: Adaptação para telas médias
-- **Mobile**: Menu hambúrguer e layout otimizado
+## Learn More
 
-## ✨ Funcionalidades JavaScript
+To learn more about Next.js, take a look at the following resources:
 
-- **Navegação Suave**: Scroll suave entre seções
-- **Menu Mobile**: Toggle do menu hambúrguer
-- **Animações**: Elementos aparecem ao rolar a página
-- **Contadores**: Números animados nas estatísticas
-- **Formulário**: Validação e envio com feedback
-- **Header Dinâmico**: Efeitos no scroll
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## 🎯 Performance
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- **CSS Otimizado**: Variáveis CSS para manutenção
-- **JavaScript Eficiente**: Debounce para eventos de scroll
-- **Imagens Otimizadas**: Logo em formato SVG
-- **Lazy Loading**: Carregamento otimizado de imagens
+## Deploy on Vercel
 
-## 🔧 Personalização
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-### Cores
-As cores principais estão definidas como variáveis CSS em `styles.css`:
-```css
-:root {
-    --primary-blue: #2563eb;
-    --secondary-blue: #1e40af;
-    --accent-blue: #3b82f6;
-    /* ... */
-}
-```
-
-### Conteúdo
-Edite o arquivo `index.html` para personalizar:
-- Textos e títulos
-- Informações de contato
-- Links das redes sociais
-- Estatísticas da empresa
-
-## 📞 Contato
-
-**AlgoritmumBrasil**
-- 📧 Email: contato@algoritrumbrasil.com.br
-- 📱 Telefone: (11) 99999-9999
-- 🌐 Website: www.algoritrumbrasil.com.br
-
-## 📄 Licença
-
-Este projeto foi desenvolvido para a AlgoritmumBrasil. Todos os direitos reservados.
-
----
-
-**Desenvolvido com ❤️ para AlgoritmumBrasil**
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
