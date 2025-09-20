@@ -139,7 +139,7 @@ export default function MetasPage() {
     if (sucesso) {
       setFormOrcamento({
         categoria: '',
-        descricao: '',
+        description: '',
         valor_limite: 0,
         periodo: 'mensal'
       });
@@ -290,7 +290,7 @@ export default function MetasPage() {
 
           <div className="grid gap-6 md:grid-cols-2">
             {metas.map((meta) => {
-                const progresso = calcularProgressoMeta(meta.id);
+                const progresso = calcularProgresso(meta);
               return (
                 <Card key={meta.id}>
                   <CardHeader>
@@ -386,7 +386,7 @@ export default function MetasPage() {
                     <Input 
                       id="descricao-orcamento" 
                       placeholder="Descrição do orçamento" 
-                      value={formOrcamento.descricao}
+                      value={formOrcamento.description}
                       onChange={(e) => setFormOrcamento(prev => ({ ...prev, descricao: e.target.value }))}
                     />
                   </div>
@@ -432,7 +432,7 @@ export default function MetasPage() {
 
           <div className="grid gap-4">
             {orcamentos.map((orcamento) => {
-                const uso = calcularProgressoOrcamento(orcamento.id);
+                const uso = calcularUsoOrcamento(orcamento);
               const isExcedido = uso > 100;
               const isProximoLimite = uso > 80 && uso <= 100;
               
