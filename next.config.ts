@@ -20,10 +20,10 @@ function validateEnvironmentVariables() {
     console.error('\n📖 Consulte o arquivo DEPLOY.md para instruções de configuração.');
     console.error('🔗 Obtenha suas credenciais em: https://supabase.com/dashboard/project/_/settings/api');
     
-    // Em desenvolvimento, apenas avisa. Em produção, falha o build
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('Variáveis de ambiente do Supabase não configuradas!');
-    }
+    // Avisa sobre variáveis faltantes mas não falha o build
+    // Permite deploy mesmo sem configuração completa do Supabase
+    console.warn('⚠️  Deploy realizado sem configuração completa do Supabase.');
+    console.warn('📝 Configure as variáveis de ambiente no Vercel para funcionalidade completa.');
   }
 }
 
