@@ -40,10 +40,10 @@ const accountFormSchema = z.object({
   bank: z.string().min(1, 'Banco é obrigatório').max(100, 'Nome do banco muito longo'),
   type: z.nativeEnum(AccountType),
   balance: z.number().min(-999999999, 'Saldo inválido').max(999999999, 'Saldo muito alto'),
-  currency: z.nativeEnum(Currency).default(Currency.BRL),
+  currency: z.nativeEnum(Currency).optional(),
   account_number: z.string().optional(),
   agency: z.string().optional(),
-  credit_limit: z.number().optional(),
+  limit: z.number().optional(),
   description: z.string().max(500, 'Descrição muito longa').optional(),
 });
 
@@ -73,7 +73,7 @@ export function AccountForm({ account, onSubmit, onCancel, loading = false }: Ac
       currency: account?.currency || Currency.BRL,
       account_number: account?.account_number || '',
       agency: account?.agency || '',
-      credit_limit: account?.credit_limit || undefined,
+      limit: account?.limit || undefined,
       description: account?.description || '',
     },
   });
@@ -335,7 +335,7 @@ export function AccountForm({ account, onSubmit, onCancel, loading = false }: Ac
                 {selectedType === AccountType.CREDIT_CARD && (
                   <FormField
                     control={form.control}
-                    name="credit_limit"
+                    name="limit"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Limite do Cartão</FormLabel>

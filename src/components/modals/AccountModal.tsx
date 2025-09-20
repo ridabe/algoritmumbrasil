@@ -39,7 +39,7 @@ interface AccountModalProps {
 export function AccountModal({ open, onOpenChange, account }: AccountModalProps) {
   const [loading, setLoading] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  const { createAccount, updateAccount, refreshAccounts } = useAccounts();
+  const { createAccount, updateAccount, refreshData } = useAccounts();
   const isEditing = !!account;
 
   /**
@@ -57,7 +57,7 @@ export function AccountModal({ open, onOpenChange, account }: AccountModalProps)
       }
       
       // Atualiza a lista de contas
-      await refreshAccounts();
+      await refreshData();
       
       // Fecha o modal
       onOpenChange(false);

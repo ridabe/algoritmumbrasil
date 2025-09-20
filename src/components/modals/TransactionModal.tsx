@@ -59,13 +59,10 @@ export function TransactionModal({
     setLoading(true);
     try {
       if (isEditing && transaction) {
-        await updateTransaction.mutateAsync({
-          id: transaction.id,
-          data: data as UpdateTransactionData
-        });
+        await updateTransaction(transaction.id, data as UpdateTransactionData);
         toast.success('Transação atualizada com sucesso!');
       } else {
-        await createTransaction.mutateAsync(data as CreateTransactionData);
+        await createTransaction(data as CreateTransactionData);
         toast.success('Transação criada com sucesso!');
       }
       onOpenChange(false);

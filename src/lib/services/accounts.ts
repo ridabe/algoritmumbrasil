@@ -11,11 +11,9 @@ import type {
   FinancialSummary,
   AccountFilters,
   AccountsResponse,
-  AccountSort,
-  AccountType,
-  AccountStatus,
-  Currency
+  AccountSort
 } from '@/lib/types/accounts';
+import { Currency, AccountStatus, AccountType } from '@/lib/types/accounts';
 
 /**
  * Classe para gerenciar operações de contas bancárias

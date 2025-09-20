@@ -62,11 +62,11 @@ const transactionSchema = z.object({
   due_date: z.date().optional(),
   notes: z.string().optional(),
   location: z.string().optional(),
-  is_recurring: z.boolean().default(false),
+  is_recurring: z.boolean().optional(),
   recurrence_frequency: z.nativeEnum(RecurrenceFrequency).optional(),
   recurrence_end_date: z.date().optional(),
   transfer_account_id: z.string().optional(),
-  tags: z.array(z.string()).default([])
+  tags: z.array(z.string()).optional()
 });
 
 type TransactionFormData = z.infer<typeof transactionSchema>;
