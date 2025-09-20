@@ -59,7 +59,6 @@ export default function MetasPage() {
 
   const [formOrcamento, setFormOrcamento] = useState<NovoOrcamentoData>({
     categoria: '',
-    description: '',
     valor_limite: 0,
     periodo: 'mensal'
   });
@@ -139,7 +138,6 @@ export default function MetasPage() {
     if (sucesso) {
       setFormOrcamento({
         categoria: '',
-        description: '',
         valor_limite: 0,
         periodo: 'mensal'
       });
@@ -381,15 +379,7 @@ export default function MetasPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="descricao-orcamento">Descrição</Label>
-                    <Input 
-                      id="descricao-orcamento" 
-                      placeholder="Descrição do orçamento" 
-                      value={formOrcamento.description}
-                      onChange={(e) => setFormOrcamento(prev => ({ ...prev, descricao: e.target.value }))}
-                    />
-                  </div>
+
                   <div className="grid gap-2">
                     <Label htmlFor="valor-limite">Valor Limite</Label>
                     <Input 

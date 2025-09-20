@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import {
   LayoutDashboard,
   CreditCard,
-  TrendingUp,
   Target,
   Settings,
   PiggyBank,

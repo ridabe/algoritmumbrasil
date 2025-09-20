@@ -51,9 +51,6 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
   
-  // Rotas públicas que não precisam de autenticação
-  const publicRoutes = ['/auth/login', '/auth/register', '/']
-  
   // Rotas protegidas que precisam de autenticação
   const protectedRoutes = ['/financas']
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))

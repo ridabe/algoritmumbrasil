@@ -4,7 +4,6 @@
  */
 
 import { createBrowserClient } from '@supabase/ssr';
-import type { Profile } from '../db/schema';
 import { supabase } from '../supabase/client';
 
 /**
@@ -75,7 +74,7 @@ export class AuthService {
 
     // Criar perfil do usuário
     if (data.user) {
-      await this.createUserProfile(data.user.id, name, email);
+      await this.createUserProfile(data.user.id, name);
     }
 
     return data;
@@ -176,7 +175,7 @@ export class AuthService {
   /**
    * Cria o perfil do usuário após o registro
    */
-  private async createUserProfile(userId: string, name: string, email: string) {
+  private async createUserProfile(userId: string, name: string) {
     const { error } = await this.supabase
       .from('profiles')
       .insert({
