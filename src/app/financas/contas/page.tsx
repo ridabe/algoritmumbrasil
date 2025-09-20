@@ -400,9 +400,9 @@ export default function ContasPage() {
                         {showBalances ? formatCurrency(account.balance) : '••••••'}
                       </div>
                       
-                      {account.type === AccountType.CREDIT_CARD && account.credit_limit && (
+                      {account.type === AccountType.CREDIT_CARD && account.limit && (
                         <p className="text-xs text-muted-foreground">
-                          Limite: {showBalances ? formatCurrency(account.credit_limit) : '••••••'}
+                          Limite: {showBalances ? formatCurrency(account.limit) : '••••••'}
                         </p>
                       )}
                       

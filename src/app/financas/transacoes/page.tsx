@@ -102,7 +102,7 @@ export default function TransacoesPage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
 
   // Hooks para dados
-  const { transactions, isLoading, deleteTransaction } = useTransactions();
+  const { transactions, loading, deleteTransaction } = useTransactions();
   const { data: summary } = useTransactionsSummary();
 
   // Filtrar transações baseado na busca e filtro
@@ -154,7 +154,7 @@ export default function TransacoesPage() {
     setEditingTransaction(undefined);
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="container mx-auto p-6">
         <div className="flex items-center justify-center h-64">
@@ -164,6 +164,8 @@ export default function TransacoesPage() {
           </div>
         </div>
       </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

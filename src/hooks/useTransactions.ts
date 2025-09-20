@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/auth-context';
 import { TransactionService } from '@/lib/services/transactions';
 import {
   Transaction,
@@ -225,7 +225,7 @@ export function useTransactions(
 /**
  * Hook simplificado para buscar apenas o resumo de transações
  */
-export function useTransactionSummary(
+export function useTransactionsSummary(
   filters?: TransactionFilters
 ): {
   summary: TransactionSummary | null;
