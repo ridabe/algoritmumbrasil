@@ -1,126 +1,36 @@
-# Algoritmum - Gestão Financeira Inteligente
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-Plataforma completa para gestão financeira pessoal e empresarial desenvolvida com Next.js 15, TypeScript e Supabase.
+## Getting Started
 
-## 🚀 Funcionalidades
+First, run the development server:
 
-- ✅ **Sistema de Autenticação Completo**
-  - Login e registro com email/senha
-  - Proteção de rotas com middleware
-  - Gerenciamento de sessão com Supabase Auth
-  - Context API para estado global
-
-- 🎨 **Interface Moderna**
-  - Design responsivo com Tailwind CSS
-  - Componentes shadcn/ui
-  - Tema claro/escuro
-  - Ícones Lucide React
-
-- 🔒 **Segurança**
-  - Middleware de proteção de rotas
-  - Validação de formulários
-  - Tratamento de erros
-  - Políticas RLS no Supabase
-
-## 🛠️ Tecnologias
-
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui
-- **Backend**: Supabase (Auth + Database)
-- **ORM**: Drizzle ORM
-- **Validação**: Zod
-- **Formulários**: React Hook Form
-
-## 📦 Instalação
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/ridabe/algoritmumbrasil.git
-cd algoritmumbrasil
-```
-
-2. Instale as dependências:
-```bash
-npm install
-```
-
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env.local
-```
-
-Edite o arquivo `.env.local` com suas credenciais do Supabase:
-```env
-NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
-```
-
-4. Execute o projeto:
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-## 📋 Configuração do Supabase
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Veja o arquivo `SUPABASE_SETUP.md` para instruções detalhadas de configuração do banco de dados.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## 🏗️ Estrutura do Projeto
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-```
-src/
-├── app/                    # App Router (Next.js 15)
-│   ├── auth/              # Páginas de autenticação
-│   │   ├── login/         # Página de login
-│   │   └── register/      # Página de registro
-│   ├── financas/          # Dashboard financeiro
-│   ├── globals.css        # Estilos globais
-│   ├── layout.tsx         # Layout raiz
-│   └── page.tsx           # Página inicial
-├── components/            # Componentes reutilizáveis
-│   └── ui/               # Componentes shadcn/ui
-├── contexts/             # Context API
-│   └── auth-context.tsx  # Contexto de autenticação
-├── lib/                  # Utilitários e configurações
-│   ├── auth/            # Serviços de autenticação
-│   ├── db/              # Configuração do banco
-│   └── utils.ts         # Funções utilitárias
-└── middleware.ts         # Middleware de proteção
-```
+## Learn More
 
-## 🔐 Autenticação
+To learn more about Next.js, take a look at the following resources:
 
-O sistema de autenticação inclui:
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-- **Login**: Email e senha com validação
-- **Registro**: Criação de conta com perfil
-- **Proteção de Rotas**: Middleware automático
-- **Gerenciamento de Estado**: Context API
-- **Redirecionamentos**: Automáticos baseados no status
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 📱 Páginas
+## Deploy on Vercel
 
-- `/` - Landing page
-- `/auth/login` - Página de login
-- `/auth/register` - Página de registro
-- `/financas` - Dashboard (protegido)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 🚀 Deploy
-
-O projeto está configurado para deploy na Vercel:
-
-1. Conecte seu repositório na Vercel
-2. Configure as variáveis de ambiente
-3. Deploy automático a cada push
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
-## 👨‍💻 Desenvolvedor
-
-Desenvolvido por **AlgoritmumBrasil** - Especialistas em desenvolvimento de sistemas e soluções tecnológicas.
-
----
-
-**Algoritmum** - Transformando sua relação com o dinheiro através da tecnologia.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

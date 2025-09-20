@@ -1,177 +1,213 @@
 /**
- * Serviços de autenticação usando Supabase Auth
- * Gerencia login, registro, logout e verificação de usuários
+ * Serviço de autenticação com Supabase
+ * Gerencia login, logout, registro e estado do usuário
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { Profile } from '../db/schema';
+import { supabase } from '../supabase/client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+/**
+ * Cliente Supabase para uso no lado do cliente (browser)
+ */
+export const supabaseClient = supabase;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/**
+ * Cria um cliente Supabase para componentes do cliente
+ */
+export const createSupabaseClient = () => {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+};
 
+// Tipos de usuário
 export interface AuthUser {
   id: string;
   email: string;
-  fullName?: string;
+  name?: string;
   avatarUrl?: string;
-  createdAt: string;
+  role: 'user' | 'admin';
 }
 
-export interface AuthResponse {
-  success: boolean;
-  user?: AuthUser;
-  error?: string;
-}
+// Serviço de autenticação
+export class AuthService {
+  private supabase;
 
-/**
- * Serviço de autenticação com métodos para gerenciar usuários
- */
-export const authService = {
+  constructor() {
+    this.supabase = createSupabaseClient();
+  }
+
   /**
-   * Realiza login com email e senha
+   * Faz login com email e senha
    */
-  async signIn(email: string, password: string): Promise<AuthResponse> {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        return {
-          success: false,
-          error: getErrorMessage(error.message),
-        };
-      }
-
-      if (data.user) {
-        const user: AuthUser = {
-          id: data.user.id,
-          email: data.user.email!,
-          fullName: data.user.user_metadata?.full_name,
-          avatarUrl: data.user.user_metadata?.avatar_url,
-          createdAt: data.user.created_at,
-        };
-
-        return {
-          success: true,
-          user,
-        };
-      }
-
-      return {
-        success: false,
-        error: 'Erro desconhecido ao fazer login',
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Erro interno do servidor',
-      };
+    if (error) {
+      throw new Error(error.message);
     }
-  },
+
+    return data;
+  }
 
   /**
    * Registra um novo usuário
    */
-  async signUp(email: string, password: string, fullName: string): Promise<AuthResponse> {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
+  async signUp(email: string, password: string, name: string) {
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
         },
-      });
+      },
+    });
 
-      if (error) {
-        return {
-          success: false,
-          error: getErrorMessage(error.message),
-        };
-      }
-
-      if (data.user) {
-        const user: AuthUser = {
-          id: data.user.id,
-          email: data.user.email!,
-          fullName: fullName,
-          createdAt: data.user.created_at,
-        };
-
-        return {
-          success: true,
-          user,
-        };
-      }
-
-      return {
-        success: false,
-        error: 'Erro desconhecido ao criar conta',
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: 'Erro interno do servidor',
-      };
+    if (error) {
+      throw new Error(error.message);
     }
-  },
+
+    // Criar perfil do usuário
+    if (data.user) {
+      await this.createUserProfile(data.user.id, name, email);
+    }
+
+    return data;
+  }
 
   /**
-   * Realiza logout do usuário atual
+   * Faz logout
    */
-  async signOut(): Promise<void> {
-    await supabase.auth.signOut();
-  },
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
 
   /**
    * Obtém o usuário atual
    */
   async getCurrentUser(): Promise<AuthUser | null> {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        return {
-          id: user.id,
-          email: user.email!,
-          fullName: user.user_metadata?.full_name,
-          avatarUrl: user.user_metadata?.avatar_url,
-          createdAt: user.created_at,
-        };
-      }
+    const { data: { user } } = await this.supabase.auth.getUser();
+    
+    if (!user) return null;
 
-      return null;
-    } catch (error) {
-      console.error('Erro ao obter usuário atual:', error);
-      return null;
-    }
-  },
+    // Buscar perfil completo do usuário
+    const { data: profile } = await this.supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) return null;
+
+    return {
+      id: user.id,
+      email: user.email!,
+      name: profile.name || undefined,
+      avatarUrl: profile.avatar_url || undefined,
+      role: profile.role as 'user' | 'admin',
+    };
+  }
 
   /**
-   * Verifica se há um usuário logado
+   * Obtém a sessão atual
    */
-  async isAuthenticated(): Promise<boolean> {
+  async getSession() {
+    const { data: { session } } = await this.supabase.auth.getSession();
+    return session;
+  }
+
+  /**
+   * Redefine a senha
+   */
+  async resetPassword(email: string) {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * Atualiza a senha
+   */
+  async updatePassword(password: string) {
+    const { error } = await this.supabase.auth.updateUser({
+      password,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * Atualiza o perfil do usuário
+   */
+  async updateProfile(updates: Partial<Pick<AuthUser, 'name' | 'avatarUrl'>>) {
     const user = await this.getCurrentUser();
-    return user !== null;
-  },
-};
+    if (!user) throw new Error('Usuário não autenticado');
 
-/**
- * Converte mensagens de erro do Supabase para português
- */
-function getErrorMessage(error: string): string {
-  const errorMessages: Record<string, string> = {
-    'Invalid login credentials': 'Email ou senha incorretos',
-    'Email not confirmed': 'Email não confirmado. Verifique sua caixa de entrada.',
-    'User already registered': 'Este email já está cadastrado',
-    'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres',
-    'Invalid email': 'Email inválido',
-    'Signup is disabled': 'Cadastro desabilitado temporariamente',
-  };
+    const { error } = await this.supabase
+      .from('profiles')
+      .update({
+        name: updates.name,
+        avatar_url: updates.avatarUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id);
 
-  return errorMessages[error] || 'Erro desconhecido. Tente novamente.';
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  /**
+   * Cria o perfil do usuário após o registro
+   */
+  private async createUserProfile(userId: string, name: string, email: string) {
+    const { error } = await this.supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        name,
+        theme: 'light',
+        currency: 'BRL',
+        locale: 'pt-BR',
+        role: 'user',
+      });
+
+    if (error) {
+      console.error('Erro ao criar perfil:', error);
+      throw new Error('Erro ao criar perfil do usuário');
+    }
+  }
+
+  /**
+   * Escuta mudanças no estado de autenticação
+   */
+  onAuthStateChange(callback: (user: AuthUser | null) => void) {
+    return this.supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const user = await this.getCurrentUser();
+        callback(user);
+      } else {
+        callback(null);
+      }
+    });
+  }
 }
+
+// Instância do serviço
+export const authService = new AuthService();

@@ -1,149 +1,130 @@
 'use client';
 
 /**
- * Context de autenticação para gerenciar o estado do usuário logado
- * Fornece funções de login, logout, registro e verificação de autenticação
+ * Contexto de autenticação para gerenciar o estado do usuário
+ * Fornece informações do usuário logado e funções de autenticação
  */
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService, type AuthUser } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: AuthUser | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateProfile: (updates: Partial<Pick<AuthUser, 'name' | 'avatarUrl'>>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-/**
- * Hook para acessar o contexto de autenticação
- * Deve ser usado dentro de um AuthProvider
- */
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
 interface AuthProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-/**
- * Provider do contexto de autenticação
- * Gerencia o estado global de autenticação da aplicação
- */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  /**
-   * Carrega o usuário atual ao inicializar o componente
-   */
   useEffect(() => {
-    loadUser();
+    // Verificar usuário atual ao inicializar
+    const initializeAuth = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Erro ao verificar usuário:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+
+    // Escutar mudanças no estado de autenticação
+    const { data: { subscription } } = authService.onAuthStateChange((user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  /**
-   * Carrega os dados do usuário atual
-   */
-  const loadUser = async () => {
-    try {
-      const currentUser = await authService.getCurrentUser();
-      setUser(currentUser);
-    } catch (error) {
-      console.error('Erro ao carregar usuário:', error);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Realiza o login do usuário
-   */
-  const login = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const result = await authService.signIn(email, password);
-      
-      if (result.success && result.user) {
-        setUser(result.user);
-        router.push('/financas');
-        return { success: true };
-      } else {
-        return { success: false, error: result.error || 'Erro ao fazer login' };
-      }
+      await authService.signIn(email, password);
+      toast.success('Login realizado com sucesso!');
+      router.push('/financas');
     } catch (error) {
-      console.error('Erro no login:', error);
-      return { success: false, error: 'Erro interno do servidor' };
+      const message = error instanceof Error ? error.message : 'Erro ao fazer login';
+      toast.error(message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Realiza o registro de um novo usuário
-   */
-  const register = async (email: string, password: string, fullName: string) => {
+  const signUp = async (email: string, password: string, name: string) => {
     try {
       setLoading(true);
-      const result = await authService.signUp(email, password, fullName);
-      
-      if (result.success) {
-        // Após o registro, fazer login automaticamente
-        const loginResult = await authService.signIn(email, password);
-        if (loginResult.success && loginResult.user) {
-          setUser(loginResult.user);
-          router.push('/financas');
-        }
-        return { success: true };
-      } else {
-        return { success: false, error: result.error || 'Erro ao criar conta' };
-      }
+      await authService.signUp(email, password, name);
+      toast.success('Conta criada com sucesso! Verifique seu email.');
+      router.push('/auth/verify-email');
     } catch (error) {
-      console.error('Erro no registro:', error);
-      return { success: false, error: 'Erro interno do servidor' };
+      const message = error instanceof Error ? error.message : 'Erro ao criar conta';
+      toast.error(message);
+      throw error;
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   * Realiza o logout do usuário
-   */
-  const logout = async () => {
+  const signOut = async () => {
     try {
+      setLoading(true);
       await authService.signOut();
-      setUser(null);
-      router.push('/');
+      toast.success('Logout realizado com sucesso!');
+      router.push('/auth/login');
     } catch (error) {
-      console.error('Erro no logout:', error);
+      const message = error instanceof Error ? error.message : 'Erro ao fazer logout';
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  /**
-   * Atualiza os dados do usuário atual
-   */
-  const refreshUser = async () => {
-    await loadUser();
+  const updateProfile = async (updates: Partial<Pick<AuthUser, 'name' | 'avatarUrl'>>) => {
+    try {
+      await authService.updateProfile(updates);
+      
+      // Atualizar estado local
+      if (user) {
+        setUser({ ...user, ...updates });
+      }
+      
+      toast.success('Perfil atualizado com sucesso!');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao atualizar perfil';
+      toast.error(message);
+      throw error;
+    }
   };
 
   const value: AuthContextType = {
     user,
     loading,
-    login,
-    register,
-    logout,
-    refreshUser,
+    signIn,
+    signUp,
+    signOut,
+    updateProfile,
   };
 
   return (
@@ -151,4 +132,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
       {children}
     </AuthContext.Provider>
   );
+}
+
+// Hook para usar o contexto de autenticação
+export function useAuth() {
+  const context = useContext(AuthContext);
+  
+  if (context === undefined) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
+  
+  return context;
+}
+
+// Hook para verificar se o usuário está autenticado
+export function useRequireAuth() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
+
+  return { user, loading };
 }

@@ -1,197 +1,113 @@
 # Configuração do Supabase para Algoritmum
 
-Este guia explica como configurar o Supabase para o projeto Algoritmum.
-
 ## 1. Criar Projeto no Supabase
 
 1. Acesse [supabase.com](https://supabase.com)
 2. Faça login ou crie uma conta
 3. Clique em "New Project"
 4. Escolha sua organização
-5. Preencha:
+5. Configure o projeto:
    - **Name**: algoritmum
-   - **Database Password**: (gere uma senha segura)
-   - **Region**: South America (São Paulo) - para melhor performance no Brasil
+   - **Database Password**: Crie uma senha segura
+   - **Region**: Escolha a região mais próxima (ex: South America)
 6. Clique em "Create new project"
 
 ## 2. Configurar Variáveis de Ambiente
 
 Após criar o projeto, vá em **Settings > API** e copie:
 
-- **Project URL**
-- **anon/public key**
-- **service_role key** (mantenha em segredo)
+1. **Project URL** - Cole em `NEXT_PUBLIC_SUPABASE_URL`
+2. **anon public** key - Cole em `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. **service_role** key - Cole em `SUPABASE_SERVICE_ROLE_KEY`
 
-Crie um arquivo `.env.local` na raiz do projeto:
+Atualize o arquivo `.env.local`:
 
 ```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima_aqui
-SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role_aqui
-
-# Database URL (para Drizzle ORM)
-DATABASE_URL=postgresql://postgres:[SUA-SENHA]@db.seu-projeto.supabase.co:5432/postgres
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_anon_key_aqui
+SUPABASE_SERVICE_ROLE_KEY=sua_service_role_key_aqui
 ```
 
-## 3. Configurar Autenticação
+## 3. Executar Migrações do Banco
 
-### 3.1 Configurar Providers
+Você tem duas opções para configurar o banco de dados:
+
+### Opção A: Migração Manual (Recomendado)
+1. Acesse o SQL Editor no painel do Supabase
+2. Execute o conteúdo do arquivo `src/lib/db/migrations/001_initial_setup.sql`
+3. Isso criará todas as tabelas, índices, triggers e políticas RLS
+
+### Opção B: Drizzle Migrations
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+**Nota**: A Opção A é recomendada pois inclui configurações específicas do Supabase como RLS e categorias padrão.
+
+## 4. Configurar Autenticação
+
+No painel do Supabase:
+
+1. Vá em **Authentication > Settings**
+2. Configure **Site URL**: `http://localhost:3000`
+3. Adicione **Redirect URLs**:
+   - `http://localhost:3000/auth/callback`
+   - `https://seu-dominio.vercel.app/auth/callback` (para produção)
+
+### Configurar Google OAuth (Opcional)
 
 1. Vá em **Authentication > Providers**
-2. Configure **Email**:
-   - ✅ Enable email provider
-   - ✅ Confirm email
-   - ✅ Enable email confirmations
+2. Habilite **Google**
+3. Configure:
+   - **Client ID**: Seu Google Client ID
+   - **Client Secret**: Seu Google Client Secret
 
-### 3.2 Configurar URLs de Callback
+## 5. Configurar RLS (Row Level Security)
 
-1. Vá em **Authentication > URL Configuration**
-2. Adicione as URLs:
-   - **Site URL**: `http://localhost:3000` (desenvolvimento)
-   - **Redirect URLs**: 
-     - `http://localhost:3000/auth/callback`
-     - `https://seu-dominio.com/auth/callback` (produção)
+As políticas de segurança já estão definidas no schema. Para aplicá-las:
 
-### 3.3 Configurar Templates de Email
+1. Vá em **SQL Editor** no Supabase
+2. Execute o conteúdo do arquivo `src/lib/db/schema.ts` (as tabelas e políticas)
 
-1. Vá em **Authentication > Email Templates**
-2. Personalize os templates conforme necessário
+## 6. Testar Conexão
 
-## 4. Executar Migrações do Banco
+Após configurar tudo:
 
-### 4.1 Instalar Dependências
+1. Reinicie o servidor de desenvolvimento
+2. Acesse `http://localhost:3000`
+3. Teste o registro e login de usuários
+4. Verifique se o dashboard carrega corretamente
 
-```bash
-npm install
-```
-
-### 4.2 Configurar Schema
-
-O arquivo `src/lib/db/schema.ts` contém as definições das tabelas.
-
-### 4.3 Gerar e Executar Migrações
+## Scripts Úteis
 
 ```bash
-# Gerar arquivos de migração
+# Gerar migrações
 npm run db:generate
 
-# Executar migrações
+# Aplicar migrações
 npm run db:migrate
 
-# Ou usar push para desenvolvimento
-npm run db:push
-```
-
-### 4.4 Visualizar Banco (Opcional)
-
-```bash
-# Abrir Drizzle Studio
+# Visualizar banco (Drizzle Studio)
 npm run db:studio
+
+# Reset do banco (cuidado!)
+npm run db:reset
 ```
 
-## 5. Configurar Políticas RLS (Row Level Security)
+## Estrutura do Banco
 
-No **SQL Editor** do Supabase, execute:
+O sistema inclui as seguintes tabelas:
 
-```sql
--- Habilitar RLS nas tabelas
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE budgets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE goals ENABLE ROW LEVEL SECURITY;
+- **profiles**: Perfis de usuário
+- **accounts**: Contas bancárias
+- **income_sources**: Fontes de renda
+- **categories**: Categorias de transações
+- **transactions**: Transações financeiras
+- **recurring_rules**: Regras de recorrência
+- **budgets**: Orçamentos
+- **goals**: Metas financeiras
+- **audit_logs**: Logs de auditoria
 
--- Política para profiles (usuários só veem seus próprios dados)
-CREATE POLICY "Users can view own profile" ON profiles
-  FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own profile" ON profiles
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
--- Política para accounts
-CREATE POLICY "Users can manage own accounts" ON accounts
-  FOR ALL USING (auth.uid() = user_id);
-
--- Política para transactions
-CREATE POLICY "Users can manage own transactions" ON transactions
-  FOR ALL USING (auth.uid() = user_id);
-
--- Política para categories
-CREATE POLICY "Users can manage own categories" ON categories
-  FOR ALL USING (auth.uid() = user_id);
-
--- Política para budgets
-CREATE POLICY "Users can manage own budgets" ON budgets
-  FOR ALL USING (auth.uid() = user_id);
-
--- Política para goals
-CREATE POLICY "Users can manage own goals" ON goals
-  FOR ALL USING (auth.uid() = user_id);
-```
-
-## 6. Testar Configuração
-
-1. Execute o projeto:
-   ```bash
-   npm run dev
-   ```
-
-2. Acesse `http://localhost:3000`
-
-3. Teste o fluxo:
-   - Criar conta em `/auth/register`
-   - Fazer login em `/auth/login`
-   - Verificar redirecionamento para `/financas`
-
-## 7. Configuração para Produção
-
-### 7.1 Variáveis de Ambiente
-
-No seu provedor de hosting (Vercel, Netlify, etc.), configure:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
-DATABASE_URL=postgresql://postgres:[SENHA]@db.seu-projeto.supabase.co:5432/postgres
-```
-
-### 7.2 Atualizar URLs de Callback
-
-No Supabase, atualize as URLs para seu domínio de produção.
-
-## 8. Monitoramento
-
-1. **Logs**: Vá em **Logs** para monitorar atividade
-2. **Metrics**: Acompanhe uso em **Reports**
-3. **Database**: Monitore performance em **Database**
-
-## 9. Backup e Segurança
-
-1. Configure backups automáticos
-2. Monitore tentativas de login suspeitas
-3. Revise políticas RLS regularmente
-4. Mantenha as chaves seguras
-
-## Troubleshooting
-
-### Erro de Conexão
-- Verifique se as variáveis de ambiente estão corretas
-- Confirme se o projeto Supabase está ativo
-
-### Erro de Autenticação
-- Verifique as URLs de callback
-- Confirme se o email provider está habilitado
-
-### Erro de Banco de Dados
-- Execute as migrações: `npm run db:migrate`
-- Verifique as políticas RLS
-
----
-
-**Importante**: Mantenha suas chaves de API seguras e nunca as commite no repositório!
+Todas as tabelas possuem RLS habilitado para segurança.
