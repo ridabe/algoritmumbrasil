@@ -26,6 +26,7 @@ export interface Orcamento {
  * Interface para criar um novo orçamento
  */
 export interface NovoOrcamentoData {
+  description: string | number | readonly string[] | undefined;
   categoria: string;
   valor_limite: number;
   periodo: 'semanal' | 'mensal' | 'anual';

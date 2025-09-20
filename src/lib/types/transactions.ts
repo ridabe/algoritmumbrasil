@@ -13,9 +13,7 @@ export enum TransactionType {
 // Enums para status da transação
 export enum TransactionStatus {
   PENDING = 'pending',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-  SCHEDULED = 'scheduled'
+  CONFIRMED = 'confirmed'
 }
 
 // Enums para métodos de pagamento
@@ -66,6 +64,7 @@ export interface Transaction {
 
 // Interface para criação de transação
 export interface CreateTransactionData {
+  status: string;
   account_id: string;
   category_id: string;
   description: string;
@@ -178,9 +177,7 @@ export const PAYMENT_METHOD_LABELS = {
 // Constantes para status
 export const TRANSACTION_STATUS_LABELS = {
   [TransactionStatus.PENDING]: 'Pendente',
-  [TransactionStatus.COMPLETED]: 'Concluída',
-  [TransactionStatus.CANCELLED]: 'Cancelada',
-  [TransactionStatus.SCHEDULED]: 'Agendada'
+  [TransactionStatus.CONFIRMED]: 'Concluída'
 } as const;
 
 // Constantes para tipos

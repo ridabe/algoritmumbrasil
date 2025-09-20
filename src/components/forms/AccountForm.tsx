@@ -95,9 +95,11 @@ export function AccountForm({ account, onSubmit, onCancel, loading = false }: Ac
    */
   const handleSubmit = async (data: AccountFormData) => {
     try {
+      console.log('🚀 AccountForm: Enviando dados do formulário:', data);
       await onSubmit(data);
+      console.log('✅ AccountForm: Dados enviados com sucesso');
     } catch (error) {
-      console.error('Erro ao salvar conta:', error);
+      console.error('❌ AccountForm: Erro ao salvar conta:', error);
     }
   };
 

@@ -92,17 +92,82 @@ export function Header() {
   };
 
   /**
-   * Função para carregar resumo financeiro
-   * TODO: Implementar quando as tabelas estiverem criadas
+   * Função para carregar resumo financeiro real do banco de dados
    */
   const loadFinancialSummary = async () => {
-    // Por enquanto, dados mockados
-    setFinancialSummary({
-      totalBalance: 15750.50,
-      monthlyIncome: 8500.00,
-      monthlyExpenses: 4200.00,
-      pendingTransactions: 3,
-    });
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) {
+        console.error('Usuário não autenticado:', authError);
+        return;
+      }
+
+      // Buscar saldo total das contas
+      const { data: accounts, error: accountsError } = await supabase
+        .from('accounts')
+        .select('initial_balance, type')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (accountsError) {
+        console.error('Erro ao buscar contas:', accountsError);
+        return;
+      }
+
+      // Calcular saldo total das contas (excluindo cartões de crédito)
+      const totalBalance = (accounts || []).reduce((sum, account) => {
+        // Para cartões de crédito, o saldo negativo representa dívida
+        if (account.type === 'credit_card') {
+          return sum; // Não incluir cartões de crédito no saldo total
+        }
+        return sum + (account.initial_balance || 0);
+      }, 0);
+
+      // Buscar receitas e despesas do mês atual
+      const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+      
+      const { data: receitas } = await supabase
+        .from('transactions')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('type', 'income')
+        .gte('date', `${currentMonth}-01`)
+        .lt('date', `${currentMonth}-32`);
+
+      const { data: despesas } = await supabase
+        .from('transactions')
+        .select('amount')
+        .eq('user_id', user.id)
+        .eq('type', 'expense')
+        .gte('date', `${currentMonth}-01`)
+        .lt('date', `${currentMonth}-32`);
+
+      // Contar transações pendentes
+      const { count: pendingCount } = await supabase
+        .from('transactions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('status', 'pending');
+
+      const monthlyIncome = (receitas || []).reduce((sum, t) => sum + t.amount, 0);
+      const monthlyExpenses = (despesas || []).reduce((sum, t) => sum + t.amount, 0);
+
+      setFinancialSummary({
+        totalBalance,
+        monthlyIncome,
+        monthlyExpenses,
+        pendingTransactions: pendingCount || 0,
+      });
+    } catch (error) {
+      console.error('Erro ao carregar resumo financeiro:', error);
+      // Em caso de erro, manter valores zerados
+      setFinancialSummary({
+        totalBalance: 0,
+        monthlyIncome: 0,
+        monthlyExpenses: 0,
+        pendingTransactions: 0,
+      });
+    }
   };
 
   /**

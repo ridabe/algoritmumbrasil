@@ -37,6 +37,7 @@ interface AccountModalProps {
  * Usa Dialog em desktop e Drawer em mobile
  */
 export function AccountModal({ open, onOpenChange, account }: AccountModalProps) {
+
   const [loading, setLoading] = useState(false);
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const { createAccount, updateAccount, refreshData } = useAccounts();
@@ -46,17 +47,22 @@ export function AccountModal({ open, onOpenChange, account }: AccountModalProps)
    * Manipula o envio do formulário
    */
   const handleSubmit = async (data: CreateAccountData | UpdateAccountData) => {
+
     setLoading(true);
     try {
       if (isEditing && account) {
+        console.log('AccountModal - Atualizando conta existente');
         await updateAccount(account.id, data as UpdateAccountData);
         toast.success('Conta atualizada com sucesso!');
       } else {
+        console.log('AccountModal - Criando nova conta');
         await createAccount(data as CreateAccountData);
+        console.log('AccountModal - Conta criada com sucesso');
         toast.success('Conta criada com sucesso!');
       }
       
       // Atualiza a lista de contas
+      console.log('AccountModal - Atualizando lista de contas');
       await refreshData();
       
       // Fecha o modal

@@ -143,6 +143,9 @@ export default function ContasPage() {
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<any>(null);
 
+  // Simular usuário logado para teste
+  const mockUser = { id: 'test-user', email: 'test@example.com' };
+
   // Hook para gerenciar contas
   const {
     accounts,

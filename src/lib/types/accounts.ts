@@ -34,9 +34,11 @@ export interface Account {
   name: string;
   type: AccountType;
   bank: string;
-  balance: number;
+  balance: number; // Campo calculado para compatibilidade
+  initial_balance: number; // Campo real do banco
   currency: Currency;
   status: AccountStatus;
+  is_active: boolean; // Campo real do banco
   limit?: number; // Para cartões de crédito
   interest_rate?: number; // Para poupança e investimentos
   account_number?: string;
@@ -53,7 +55,7 @@ export interface CreateAccountData {
   name: string;
   type: AccountType;
   bank: string;
-  balance: number;
+  balance: number; // Será mapeado para initial_balance
   currency?: Currency;
   limit?: number;
   interest_rate?: number;
@@ -67,7 +69,7 @@ export interface CreateAccountData {
 export interface UpdateAccountData {
   name?: string;
   bank?: string;
-  balance?: number;
+  balance?: number; // Será mapeado para initial_balance
   limit?: number;
   interest_rate?: number;
   account_number?: string;
@@ -75,6 +77,7 @@ export interface UpdateAccountData {
   description?: string;
   color?: string;
   status?: AccountStatus;
+  is_active?: boolean;
 }
 
 // Interface para resumo financeiro

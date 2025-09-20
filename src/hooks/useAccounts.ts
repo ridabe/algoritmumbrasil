@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { accountsService } from '@/lib/services/accounts';
+import { AccountsService } from '@/lib/services/accounts';
 import type {
   Account,
   CreateAccountData,
@@ -77,7 +77,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     try {
       updateState({ loading: true, error: null });
       
-      const response = await accountsService.getAccounts(filters, sort);
+      const response = await AccountsService.getAccounts(filters, sort);
       
       updateState({
         accounts: response.accounts,
@@ -98,10 +98,13 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
    * Cria uma nova conta
    */
   const createAccount = useCallback(async (data: CreateAccountData): Promise<Account | null> => {
+
     try {
       updateState({ loading: true, error: null });
       
-      const newAccount = await accountsService.createAccount(data);
+
+      const newAccount = await AccountsService.createAccount(data);
+
       
       // Atualizar lista local
       updateState({
@@ -110,10 +113,12 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       });
       
       // Recalcular resumo
+
       await refreshData();
       
       return newAccount;
     } catch (error) {
+      console.error('Erro ao criar conta:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erro ao criar conta';
       updateState({
         loading: false,
@@ -133,7 +138,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     try {
       updateState({ loading: true, error: null });
       
-      const updatedAccount = await accountsService.updateAccount(id, data);
+      const updatedAccount = await AccountsService.updateAccount(id, data);
       
       // Atualizar lista local
       const updatedAccounts = state.accounts.map(account =>
@@ -168,7 +173,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     try {
       updateState({ loading: true, error: null });
       
-      await accountsService.deleteAccount(id);
+      await AccountsService.deleteAccount(id);
       
       // Remover da lista local
       const filteredAccounts = state.accounts.filter(account => account.id !== id);
@@ -203,7 +208,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     try {
       updateState({ loading: true, error: null });
       
-      const updatedAccount = await accountsService.updateAccountBalance(id, balance);
+      const updatedAccount = await AccountsService.updateAccountBalance(id, balance);
       
       // Atualizar lista local
       const updatedAccounts = state.accounts.map(account =>
@@ -236,7 +241,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     try {
       updateState({ loading: true, error: null });
       
-      const updatedAccount = await accountsService.toggleAccountStatus(id);
+      const updatedAccount = await AccountsService.toggleAccountStatus(id);
       
       // Atualizar lista local
       const updatedAccounts = state.accounts.map(account =>
@@ -330,7 +335,7 @@ export function useFinancialSummary() {
       setError(null);
       
       // Buscar apenas o resumo através do serviço
-      const response = await accountsService.getAccounts();
+      const response = await AccountsService.getAccounts();
       setSummary(response.summary);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao carregar resumo';

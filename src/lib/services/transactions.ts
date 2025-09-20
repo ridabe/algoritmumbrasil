@@ -33,14 +33,9 @@ export class TransactionService {
     try {
       let query = supabase
         .from('transactions')
-        .select(`
-          *,
-          accounts!inner(name),
-          categories!inner(name, color, icon),
-          transfer_accounts:accounts!transactions_transfer_account_id_fkey(name)
-        `)
+        .select('*')
         .eq('user_id', userId)
-        .order('transaction_date', { ascending: false });
+        .order('date', { ascending: false });
 
       // Aplicar filtros
       if (filters) {
@@ -60,10 +55,10 @@ export class TransactionService {
           query = query.eq('payment_method', filters.payment_method);
         }
         if (filters.date_from) {
-          query = query.gte('transaction_date', filters.date_from);
+          query = query.gte('date', filters.date_from);
         }
         if (filters.date_to) {
-          query = query.lte('transaction_date', filters.date_to);
+          query = query.lte('date', filters.date_to);
         }
         if (filters.amount_min) {
           query = query.gte('amount', filters.amount_min);
@@ -95,14 +90,21 @@ export class TransactionService {
       }
 
       // Mapear dados para o formato esperado
-      return data.map(transaction => ({
-        ...transaction,
-        account_name: transaction.accounts.name,
-        category_name: transaction.categories.name,
-        category_color: transaction.categories.color,
-        category_icon: transaction.categories.icon,
-        transfer_account_name: transaction.transfer_accounts?.name
-      }));
+      return data.map(transaction => {
+        let parsedTags = [];
+        try {
+          parsedTags = transaction.tags && transaction.tags.trim() !== '' ? JSON.parse(transaction.tags) : [];
+        } catch (parseError) {
+          console.warn('Erro ao fazer parse das tags da transação:', transaction.id, parseError);
+          parsedTags = [];
+        }
+        
+        return {
+          ...transaction,
+          transaction_date: transaction.date, // Mapear date para transaction_date
+          tags: parsedTags
+        };
+      });
     } catch (error) {
       console.error('Erro no serviço de transações:', error);
       throw error;
@@ -159,17 +161,32 @@ export class TransactionService {
     transactionData: CreateTransactionData
   ): Promise<Transaction> {
     try {
+      console.log('Criando transação com dados:', transactionData);
+      
+      // Mapear campos do frontend para o banco de dados
+      const dbData = {
+        user_id: userId,
+        type: transactionData.type,
+        amount: transactionData.amount,
+        date: transactionData.transaction_date, // Mapear transaction_date para date
+        account_id: transactionData.account_id,
+        category_id: transactionData.category_id,
+        description: transactionData.description,
+        tags: transactionData.tags ? JSON.stringify(transactionData.tags) : '[]',
+        status: transactionData.status || 'confirmed', // Usar o valor do enum do banco
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Dados mapeados para o banco:', dbData);
+
       const { data, error } = await supabase
         .from('transactions')
-        .insert({
-          ...transactionData,
-          user_id: userId,
-          status: TransactionStatus.COMPLETED,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+        .insert(dbData)
         .select()
         .single();
+
+      console.log('Resultado da inserção:', { data, error });
 
       if (error) {
         console.error('Erro ao criar transação:', error);
@@ -177,7 +194,7 @@ export class TransactionService {
       }
 
       // Atualizar saldo da conta se a transação for concluída
-      if (data.status === TransactionStatus.COMPLETED) {
+      if (data.status === TransactionStatus.CONFIRMED) {
         await this.updateAccountBalance(data.account_id, data.amount, data.type);
         
         // Se for transferência, atualizar conta de destino também
@@ -208,12 +225,28 @@ export class TransactionService {
         throw new Error('Transação não encontrada');
       }
 
+      // Mapear campos do frontend para o banco de dados
+      const dbUpdateData: any = {
+        updated_at: new Date().toISOString()
+      };
+
+      // Mapear apenas os campos que foram fornecidos
+      if (updateData.transaction_date !== undefined) {
+        dbUpdateData.date = updateData.transaction_date;
+      }
+      if (updateData.tags !== undefined) {
+        dbUpdateData.tags = JSON.stringify(updateData.tags);
+      }
+      // Copiar outros campos diretamente
+      Object.keys(updateData).forEach(key => {
+        if (key !== 'transaction_date' && key !== 'tags') {
+          dbUpdateData[key] = updateData[key as keyof UpdateTransactionData];
+        }
+      });
+
       const { data, error } = await supabase
         .from('transactions')
-        .update({
-          ...updateData,
-          updated_at: new Date().toISOString()
-        })
+        .update(dbUpdateData)
         .eq('id', transactionId)
         .eq('user_id', userId)
         .select()
@@ -225,7 +258,7 @@ export class TransactionService {
       }
 
       // Reverter saldo anterior se necessário
-      if (currentTransaction.status === TransactionStatus.COMPLETED) {
+      if (currentTransaction.status === TransactionStatus.CONFIRMED) {
         await this.updateAccountBalance(
           currentTransaction.account_id,
           -currentTransaction.amount,
@@ -242,7 +275,7 @@ export class TransactionService {
       }
 
       // Aplicar novo saldo se a transação estiver concluída
-      if (data.status === TransactionStatus.COMPLETED) {
+      if (data.status === TransactionStatus.CONFIRMED) {
         await this.updateAccountBalance(data.account_id, data.amount, data.type);
         
         if (data.type === TransactionType.TRANSFER && data.transfer_account_id) {
@@ -280,7 +313,7 @@ export class TransactionService {
       }
 
       // Reverter saldo da conta se a transação estava concluída
-      if (transaction.status === TransactionStatus.COMPLETED) {
+      if (transaction.status === TransactionStatus.CONFIRMED) {
         await this.updateAccountBalance(
           transaction.account_id,
           -transaction.amount,
@@ -312,7 +345,7 @@ export class TransactionService {
       const transactions = await this.getTransactions(userId, filters);
       
       const completedTransactions = transactions.filter(
-        t => t.status === TransactionStatus.COMPLETED
+        t => t.status === TransactionStatus.CONFIRMED
       );
       
       const incomeTransactions = completedTransactions.filter(
