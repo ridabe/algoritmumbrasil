@@ -1,144 +1,126 @@
-# AlgoritmumBrasil - Landing Page
+# Algoritmum - Gestão Financeira Inteligente
 
-## 📋 Sobre o Projeto
+Plataforma completa para gestão financeira pessoal e empresarial desenvolvida com Next.js 15, TypeScript e Supabase.
 
-Landing page profissional da **AlgoritmumBrasil**, empresa especializada em desenvolvimento de sistemas, soluções de inteligência artificial e consultoria tecnológica.
+## 🚀 Funcionalidades
 
-## 🚀 Características
+- ✅ **Sistema de Autenticação Completo**
+  - Login e registro com email/senha
+  - Proteção de rotas com middleware
+  - Gerenciamento de sessão com Supabase Auth
+  - Context API para estado global
 
-- **Design Responsivo**: Adaptado para desktop, tablet e dispositivos móveis
-- **Tema Profissional**: Paleta de cores azul com gradientes modernos
-- **Animações Suaves**: Transições e efeitos visuais elegantes
-- **Performance Otimizada**: Código limpo e otimizado para carregamento rápido
-- **SEO Friendly**: Estrutura semântica e meta tags otimizadas
+- 🎨 **Interface Moderna**
+  - Design responsivo com Tailwind CSS
+  - Componentes shadcn/ui
+  - Tema claro/escuro
+  - Ícones Lucide React
 
-## 🛠️ Tecnologias Utilizadas
+- 🔒 **Segurança**
+  - Middleware de proteção de rotas
+  - Validação de formulários
+  - Tratamento de erros
+  - Políticas RLS no Supabase
 
-- **HTML5**: Estrutura semântica e acessível
-- **CSS3**: Estilos modernos com Flexbox e Grid
-- **JavaScript**: Interatividade e animações
-- **SVG**: Logo vetorial escalável
+## 🛠️ Tecnologias
 
-## 📁 Estrutura do Projeto
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Backend**: Supabase (Auth + Database)
+- **ORM**: Drizzle ORM
+- **Validação**: Zod
+- **Formulários**: React Hook Form
 
-```
-algoritmumbrasil/
-├── index.html          # Página principal
-├── styles.css          # Estilos CSS
-├── script.js           # JavaScript
-├── images/
-│   └── logo.svg        # Logo da empresa
-└── README.md           # Documentação
-```
+## 📦 Instalação
 
-## 🎨 Seções da Landing Page
-
-### 1. **Header**
-- Logo da empresa
-- Menu de navegação responsivo
-- Menu hambúrguer para mobile
-
-### 2. **Hero Section**
-- Apresentação impactante da empresa
-- Call-to-action principal
-- Efeito parallax sutil
-
-### 3. **Serviços**
-- **Desenvolvimento de Sistemas**: Soluções personalizadas
-- **Inteligência Artificial**: Implementação de IA
-- **Consultoria Tecnológica**: Assessoria especializada
-
-### 4. **Sobre a Empresa**
-- Estatísticas e números
-- Diferenciais competitivos
-- Contadores animados
-
-### 5. **Contato**
-- Formulário de contato funcional
-- Validação de campos
-- Notificações de sucesso/erro
-
-### 6. **Footer**
-- Links úteis
-- Redes sociais
-- Informações de contato
-
-## 🚀 Como Executar
-
-### Opção 1: Servidor Local Python
+1. Clone o repositório:
 ```bash
-# Navegue até a pasta do projeto
+git clone https://github.com/ridabe/algoritmumbrasil.git
 cd algoritmumbrasil
-
-# Inicie o servidor HTTP
-python -m http.server 8000
-
-# Acesse no navegador
-http://localhost:8000
 ```
 
-### Opção 2: Live Server (VS Code)
-1. Instale a extensão "Live Server" no VS Code
-2. Clique com o botão direito no arquivo `index.html`
-3. Selecione "Open with Live Server"
-
-### Opção 3: Servidor Web
-- Faça upload dos arquivos para seu servidor web
-- Acesse através do domínio configurado
-
-## 📱 Responsividade
-
-- **Desktop**: Layout completo com todas as funcionalidades
-- **Tablet**: Adaptação para telas médias
-- **Mobile**: Menu hambúrguer e layout otimizado
-
-## ✨ Funcionalidades JavaScript
-
-- **Navegação Suave**: Scroll suave entre seções
-- **Menu Mobile**: Toggle do menu hambúrguer
-- **Animações**: Elementos aparecem ao rolar a página
-- **Contadores**: Números animados nas estatísticas
-- **Formulário**: Validação e envio com feedback
-- **Header Dinâmico**: Efeitos no scroll
-
-## 🎯 Performance
-
-- **CSS Otimizado**: Variáveis CSS para manutenção
-- **JavaScript Eficiente**: Debounce para eventos de scroll
-- **Imagens Otimizadas**: Logo em formato SVG
-- **Lazy Loading**: Carregamento otimizado de imagens
-
-## 🔧 Personalização
-
-### Cores
-As cores principais estão definidas como variáveis CSS em `styles.css`:
-```css
-:root {
-    --primary-blue: #2563eb;
-    --secondary-blue: #1e40af;
-    --accent-blue: #3b82f6;
-    /* ... */
-}
+2. Instale as dependências:
+```bash
+npm install
 ```
 
-### Conteúdo
-Edite o arquivo `index.html` para personalizar:
-- Textos e títulos
-- Informações de contato
-- Links das redes sociais
-- Estatísticas da empresa
+3. Configure as variáveis de ambiente:
+```bash
+cp .env.example .env.local
+```
 
-## 📞 Contato
+Edite o arquivo `.env.local` com suas credenciais do Supabase:
+```env
+NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
+```
 
-**AlgoritmumBrasil**
-- 📧 Email: contato@algoritrumbrasil.com.br
-- 📱 Telefone: (11) 99999-9999
-- 🌐 Website: www.algoritrumbrasil.com.br
+4. Execute o projeto:
+```bash
+npm run dev
+```
+
+## 📋 Configuração do Supabase
+
+Veja o arquivo `SUPABASE_SETUP.md` para instruções detalhadas de configuração do banco de dados.
+
+## 🏗️ Estrutura do Projeto
+
+```
+src/
+├── app/                    # App Router (Next.js 15)
+│   ├── auth/              # Páginas de autenticação
+│   │   ├── login/         # Página de login
+│   │   └── register/      # Página de registro
+│   ├── financas/          # Dashboard financeiro
+│   ├── globals.css        # Estilos globais
+│   ├── layout.tsx         # Layout raiz
+│   └── page.tsx           # Página inicial
+├── components/            # Componentes reutilizáveis
+│   └── ui/               # Componentes shadcn/ui
+├── contexts/             # Context API
+│   └── auth-context.tsx  # Contexto de autenticação
+├── lib/                  # Utilitários e configurações
+│   ├── auth/            # Serviços de autenticação
+│   ├── db/              # Configuração do banco
+│   └── utils.ts         # Funções utilitárias
+└── middleware.ts         # Middleware de proteção
+```
+
+## 🔐 Autenticação
+
+O sistema de autenticação inclui:
+
+- **Login**: Email e senha com validação
+- **Registro**: Criação de conta com perfil
+- **Proteção de Rotas**: Middleware automático
+- **Gerenciamento de Estado**: Context API
+- **Redirecionamentos**: Automáticos baseados no status
+
+## 📱 Páginas
+
+- `/` - Landing page
+- `/auth/login` - Página de login
+- `/auth/register` - Página de registro
+- `/financas` - Dashboard (protegido)
+
+## 🚀 Deploy
+
+O projeto está configurado para deploy na Vercel:
+
+1. Conecte seu repositório na Vercel
+2. Configure as variáveis de ambiente
+3. Deploy automático a cada push
 
 ## 📄 Licença
 
-Este projeto foi desenvolvido para a AlgoritmumBrasil. Todos os direitos reservados.
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## 👨‍💻 Desenvolvedor
+
+Desenvolvido por **AlgoritmumBrasil** - Especialistas em desenvolvimento de sistemas e soluções tecnológicas.
 
 ---
 
-**Desenvolvido com ❤️ para AlgoritmumBrasil**
+**Algoritmum** - Transformando sua relação com o dinheiro através da tecnologia.
