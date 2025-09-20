@@ -4,21 +4,19 @@
  */
 
 import { createBrowserClient } from '@supabase/ssr';
-import type { Database } from '../db';
+import type { Profile } from '../db/schema';
+import { supabase } from '../supabase/client';
 
 /**
  * Cliente Supabase para uso no lado do cliente (browser)
  */
-export const supabaseClient = createBrowserClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+export const supabaseClient = supabase;
 
 /**
  * Cria um cliente Supabase para componentes do cliente
  */
 export const createSupabaseClient = () => {
-  return createBrowserClient<Database>(
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -114,9 +112,9 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email!,
-      name: profile.name,
-      avatarUrl: profile.avatar_url,
-      role: profile.role,
+      name: profile.name || undefined,
+      avatarUrl: profile.avatar_url || undefined,
+      role: profile.role as 'user' | 'admin',
     };
   }
 

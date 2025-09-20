@@ -27,7 +27,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { register } = useAuth();
+  const { signUp } = useAuth();
   const router = useRouter();
 
   /**
@@ -87,7 +87,7 @@ export default function RegisterPage() {
     setError('');
     
     try {
-      await register(formData.email, formData.password, formData.fullName);
+      await signUp(formData.email, formData.password, formData.fullName);
       router.push('/financas'); // Redireciona para dashboard após registro
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta');
