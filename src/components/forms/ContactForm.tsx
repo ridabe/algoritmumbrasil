@@ -230,29 +230,31 @@ export default function ContactForm() {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl flex items-center">
-          <Mail className="h-6 w-6 text-primary mr-3" />
-          Entre em Contato
-        </CardTitle>
-        <CardDescription>
-          Preencha o formulário abaixo e nossa equipe entrará em contato com você.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="relative">
+      <div className="absolute -inset-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl blur-xl animate-pulse" />
+      <Card className="max-w-2xl mx-auto relative bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-sm border border-border/50 rounded-3xl">
+        <CardHeader className="pb-8">
+          <CardTitle className="text-3xl md:text-4xl font-bold flex items-center bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+            <Mail className="h-8 w-8 text-primary mr-4" />
+            Envie uma Mensagem
+          </CardTitle>
+          <CardDescription className="text-lg text-muted-foreground/80">
+            Preencha o formulário abaixo e nossa equipe entrará em contato com você.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-8">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {/* Informações Pessoais */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome Completo *</Label>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-base font-semibold text-foreground">Nome Completo *</Label>
               <Input
                 id="name"
                 type="text"
                 placeholder="Seu nome completo"
                 value={formData.name}
                 onChange={(e) => updateField('name', e.target.value)}
-                className={errors.name ? 'border-red-500' : ''}
+                className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border ${errors.name ? 'border-red-500' : ''}`}
               />
               {errors.name && (
                 <p className="text-sm text-red-500 flex items-center">
@@ -262,15 +264,15 @@ export default function ContactForm() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail *</Label>
+            <div className="space-y-3">
+              <Label htmlFor="email" className="text-base font-semibold text-foreground">E-mail *</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="seu@email.com"
                 value={formData.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                className={errors.email ? 'border-red-500' : ''}
+                className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border ${errors.email ? 'border-red-500' : ''}`}
               />
               {errors.email && (
                 <p className="text-sm text-red-500 flex items-center">
@@ -281,16 +283,16 @@ export default function ContactForm() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <Label htmlFor="phone" className="text-base font-semibold text-foreground">Telefone</Label>
               <Input
                 id="phone"
                 type="tel"
                 placeholder="(11) 99999-9999"
                 value={formData.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
-                className={errors.phone ? 'border-red-500' : ''}
+                className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border ${errors.phone ? 'border-red-500' : ''}`}
               />
               {errors.phone && (
                 <p className="text-sm text-red-500 flex items-center">
@@ -300,33 +302,34 @@ export default function ContactForm() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="company">Empresa</Label>
+            <div className="space-y-3">
+              <Label htmlFor="company" className="text-base font-semibold text-foreground">Empresa</Label>
               <Input
                 id="company"
                 type="text"
                 placeholder="Nome da sua empresa"
                 value={formData.company}
                 onChange={(e) => updateField('company', e.target.value)}
+                className="px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border"
               />
             </div>
           </div>
 
           {/* Tipo de Serviço */}
-          <div className="space-y-2">
-            <Label htmlFor="service">Tipo de Serviço *</Label>
-            <Select value={formData.service} onValueChange={(value) => updateField('service', value)}>
-              <SelectTrigger className={errors.service ? 'border-red-500' : ''}>
+          <div className="space-y-3">
+            <Label htmlFor="service" className="text-base font-semibold text-foreground">Tipo de Serviço *</Label>
+            <Select value={formData.service} onValueChange={(value: string) => updateField('service', value)}>
+              <SelectTrigger className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border ${errors.service ? 'border-red-500' : ''}`}>
                 <SelectValue placeholder="Selecione o tipo de serviço" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sistema-financeiro">Monetrix</SelectItem>
-                <SelectItem value="rpa-automacao">RPA e Automação</SelectItem>
-                <SelectItem value="data-ia">Data & IA</SelectItem>
-                <SelectItem value="sistema-personalizado">Sistema Personalizado</SelectItem>
-                <SelectItem value="consultoria">Consultoria Tecnológica</SelectItem>
-                <SelectItem value="suporte">Suporte Técnico</SelectItem>
-                <SelectItem value="outros">Outros</SelectItem>
+              <SelectContent className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-2xl">
+                <SelectItem value="sistema-financeiro" className="text-lg py-3">Monetrix</SelectItem>
+                <SelectItem value="rpa-automacao" className="text-lg py-3">RPA e Automação</SelectItem>
+                <SelectItem value="data-ia" className="text-lg py-3">Data & IA</SelectItem>
+                <SelectItem value="sistema-personalizado" className="text-lg py-3">Sistema Personalizado</SelectItem>
+                <SelectItem value="consultoria" className="text-lg py-3">Consultoria Tecnológica</SelectItem>
+                <SelectItem value="suporte" className="text-lg py-3">Suporte Técnico</SelectItem>
+                <SelectItem value="outros" className="text-lg py-3">Outros</SelectItem>
               </SelectContent>
             </Select>
             {errors.service && (
@@ -338,15 +341,15 @@ export default function ContactForm() {
           </div>
 
           {/* Assunto */}
-          <div className="space-y-2">
-            <Label htmlFor="subject">Assunto *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="subject" className="text-base font-semibold text-foreground">Assunto *</Label>
             <Input
               id="subject"
               type="text"
               placeholder="Assunto da sua mensagem"
               value={formData.subject}
               onChange={(e) => updateField('subject', e.target.value)}
-              className={errors.subject ? 'border-red-500' : ''}
+              className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg hover:bg-background/90 hover:border-border ${errors.subject ? 'border-red-500' : ''}`}
             />
             {errors.subject && (
               <p className="text-sm text-red-500 flex items-center">
@@ -357,15 +360,15 @@ export default function ContactForm() {
           </div>
 
           {/* Mensagem */}
-          <div className="space-y-2">
-            <Label htmlFor="message">Mensagem *</Label>
+          <div className="space-y-3">
+            <Label htmlFor="message" className="text-base font-semibold text-foreground">Mensagem *</Label>
             <Textarea
               id="message"
               placeholder="Descreva sua necessidade ou dúvida..."
-              rows={5}
+              rows={6}
               value={formData.message}
               onChange={(e) => updateField('message', e.target.value)}
-              className={errors.message ? 'border-red-500' : ''}
+              className={`px-6 py-4 bg-background/80 backdrop-blur-sm border border-border/50 rounded-2xl focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all duration-300 text-lg resize-none hover:bg-background/90 hover:border-border ${errors.message ? 'border-red-500' : ''}`}
             />
             {errors.message && (
               <p className="text-sm text-red-500 flex items-center">
@@ -380,7 +383,7 @@ export default function ContactForm() {
             <Checkbox
               id="terms"
               checked={formData.acceptTerms}
-              onCheckedChange={(checked) => updateField('acceptTerms', !!checked)}
+              onCheckedChange={(checked: boolean) => updateField('acceptTerms', !!checked)}
               className={errors.acceptTerms ? 'border-red-500' : ''}
             />
             <div className="grid gap-1.5 leading-none">
@@ -402,24 +405,24 @@ export default function ContactForm() {
           {/* Botão de Envio */}
           <Button 
             type="submit" 
-            className="w-full" 
-            size="lg"
+            className="w-full py-6 px-8 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 border-0" 
             disabled={status === 'loading'}
           >
             {status === 'loading' ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                 Enviando...
               </>
             ) : (
               <>
-                <Send className="mr-2 h-5 w-5" />
+                <Send className="mr-3 h-6 w-6" />
                 Enviar Mensagem
               </>
             )}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

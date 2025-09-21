@@ -74,3 +74,29 @@ body {
 .dark [data-slot="select-content"] {
   box-shadow: 0 10px 15px -3px rgb(255 255 255 / 0.1), 0 4px 6px -4px rgb(255 255 255 / 0.1) !important;
 }
+
+/* Garantir fundo opaco para dropdown do menu Sistemas */
+[data-slot="dropdown-menu-content"] {
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+
+/* Garantir fundo completamente opaco para o header/navbar */
+nav {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+}
+
+.dark nav {
+  background-color: #000000 !important;
+}
+
+/* Forçar fundo opaco em todas as classes do navbar */
+.bg-background {
+  background-color: #ffffff !important;
+}
+
+.dark .bg-background {
+  background-color: #000000 !important;
+}
