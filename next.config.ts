@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Configurações de ambiente
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  },
+  
+  // Pacotes externos para o servidor
+  serverExternalPackages: ['@supabase/supabase-js'],
   // Configurações de redirect para manter compatibilidade com URLs antigas
   async redirects() {
     return [
@@ -43,48 +51,8 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
-  // Configurações específicas para resolver problemas do Vercel com LightningCSS
-  webpack: (config, { isServer }) => {
-    // Resolver problemas com módulos nativos no Vercel
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        path: false,
-        os: false,
-        process: false,
-        buffer: false,
-      };
-      
-      // Configurar bibliotecas externas via CDN
-      config.externals = {
-        ...config.externals,
-        'date-fns': 'dateFns',
-        'decimal.js': 'Decimal',
-        'clsx': 'clsx',
-        'lucide-react': 'LucideReact',
-        'recharts': 'Recharts',
-        'zod': 'z',
-      };
-    }
-    
-    // Resolver problemas do Supabase com Edge Runtime
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@supabase/supabase-js': '@supabase/supabase-js/dist/module/index.js',
-    };
-    
-    // Ignorar módulos nativos do LightningCSS durante o build
-    if (!config.externals) config.externals = [];
-    if (Array.isArray(config.externals)) {
-      config.externals.push({
-        'lightningcss-linux-x64-gnu': 'lightningcss-linux-x64-gnu',
-        'lightningcss-darwin-x64': 'lightningcss-darwin-x64',
-        'lightningcss-darwin-arm64': 'lightningcss-darwin-arm64',
-        'lightningcss-win32-x64-msvc': 'lightningcss-win32-x64-msvc',
-      });
-    }
-    
+  // Configuração webpack simplificada
+  webpack: (config) => {
     return config;
   },
 };
