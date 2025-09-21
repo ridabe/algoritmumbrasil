@@ -22,6 +22,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Estado para verificar se está no cliente
+let isClient = false;
+if (typeof window !== 'undefined') {
+  isClient = true;
+}
+
 interface AuthProviderProps {
   children: React.ReactNode;
 }
@@ -29,9 +35,18 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
+  // Verificar se o componente foi montado no cliente
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Inicializar autenticação apenas no cliente
+  useEffect(() => {
+    if (!mounted || !isClient) return;
+
     // Verificar usuário atual ao inicializar
     const initializeAuth = async () => {
       try {
@@ -78,14 +93,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [mounted]);
+
+  // Renderizar loading durante a hidratação
+  if (!mounted) {
+    return <div>Carregando...</div>;
+  }
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
       await authService.signIn(email, password);
       toast.success('Login realizado com sucesso!');
-      router.push('/financas');
+      router.push('/sistemas/financeiro');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro ao fazer login';
       toast.error(message);
