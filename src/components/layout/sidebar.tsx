@@ -146,10 +146,10 @@ export function Sidebar() {
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           {!isCollapsed && (
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">A</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <img src="/monetrix-icon.svg" alt="Monetrix" className="h-5 w-5" />
               </div>
-              <span className="font-bold text-gray-900">Algoritmum</span>
+              <span className="font-bold text-gray-900">Monetrix</span>
             </Link>
           )}
           
@@ -185,7 +185,7 @@ export function Sidebar() {
         {!isCollapsed && (
           <div className="p-4 border-t border-gray-200">
             <div className="text-xs text-gray-500 text-center">
-              © 2024 Algoritmum
+              © 2024 Monetrix
             </div>
           </div>
         )}

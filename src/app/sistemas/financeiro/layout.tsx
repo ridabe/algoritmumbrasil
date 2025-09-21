@@ -8,7 +8,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 
 export const metadata: Metadata = {
-  title: 'Finanças | Algoritmum',
+  title: 'Finanças | Monetrix',
   description: 'Gerencie suas finanças pessoais de forma inteligente',
 };
 

@@ -30,10 +30,7 @@ const nextConfig: NextConfig = {
     ]
   },
   
-  // Configurações experimentais
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
+  // Configurações experimentais removidas para compatibilidade com Vercel
   
   // Configurações do ESLint para permitir build
   eslint: {
