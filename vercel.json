@@ -12,7 +12,10 @@
       "NEXT_TELEMETRY_DISABLED": "1",
       "NODE_ENV": "production",
       "NEXT_DISABLE_LIGHTNINGCSS": "1",
-      "POSTCSS_CONFIG_PATH": "./postcss.config.mjs"
+      "POSTCSS_CONFIG_PATH": "./postcss.config.js",
+      "NEXT_DISABLE_SWC_CSS": "1",
+      "NEXT_FORCE_POSTCSS": "1",
+      "VERCEL_FORCE_NO_BUILD_CACHE": "1"
     }
   },
   "headers": [

@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
   
   // Pacotes externos para o servidor
   serverExternalPackages: ['@supabase/supabase-js'],
+  
+  // Configurações experimentais para compatibilidade com Vercel
+  experimental: {
+    // Desabilita otimizações CSS que podem causar problemas no Vercel
+    optimizeCss: false,
+  },
+  
+  // Configuração CSS para compatibilidade com Vercel
+  sassOptions: {
+    includePaths: [],
+  },
   // Configurações de redirect para manter compatibilidade com URLs antigas
   async redirects() {
     return [
@@ -51,15 +62,39 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
-  // Configuração webpack simplificada
-  webpack: (config) => {
+  // Configuração webpack robusta para Vercel
+  webpack: (config, { dev, isServer }) => {
     // Configuração para evitar problemas com PostCSS no Vercel
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
       os: false,
+      crypto: false,
+      stream: false,
+      util: false,
     };
+
+    // Configuração específica para PostCSS no ambiente serverless
+    if (!dev && !isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'postcss/lib/postcss': 'postcss',
+      };
+    }
+
+    // Ignorar módulos problemáticos no Vercel
+    config.externals = config.externals || [];
+    if (Array.isArray(config.externals)) {
+      config.externals.push({
+        'lightningcss': 'lightningcss',
+        'lightningcss-linux-x64-gnu': 'lightningcss-linux-x64-gnu',
+        'lightningcss-linux-x64-musl': 'lightningcss-linux-x64-musl',
+        'lightningcss-darwin-x64': 'lightningcss-darwin-x64',
+        'lightningcss-darwin-arm64': 'lightningcss-darwin-arm64',
+        'lightningcss-win32-x64-msvc': 'lightningcss-win32-x64-msvc',
+      });
+    }
     
     return config;
   },
