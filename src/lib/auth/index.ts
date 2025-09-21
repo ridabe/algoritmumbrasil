@@ -4,7 +4,6 @@
  */
 
 import { createBrowserClient } from '@supabase/ssr';
-import type { Profile } from '../db/schema';
 import { supabase } from '../supabase/client';
 
 /**
@@ -43,10 +42,14 @@ export class AuthService {
    * Faz login com email e senha
    */
   async signIn(email: string, password: string) {
+    console.log('AuthService: Tentando fazer login com:', email);
+    
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    console.log('AuthService: Resultado do login:', { data, error });
 
     if (error) {
       throw new Error(error.message);
@@ -75,7 +78,7 @@ export class AuthService {
 
     // Criar perfil do usuário
     if (data.user) {
-      await this.createUserProfile(data.user.id, name, email);
+      await this.createUserProfile(data.user.id, name);
     }
 
     return data;
@@ -96,26 +99,64 @@ export class AuthService {
    * Obtém o usuário atual
    */
   async getCurrentUser(): Promise<AuthUser | null> {
-    const { data: { user } } = await this.supabase.auth.getUser();
-    
-    if (!user) return null;
+    try {
+      console.log('AuthService: Verificando usuário atual...');
+      const { data: { user }, error } = await this.supabase.auth.getUser();
+      
+      if (error) {
+        console.error('AuthService: Erro ao obter usuário:', error);
+        return null;
+      }
+      
+      if (!user) {
+        console.log('AuthService: Nenhum usuário encontrado');
+        return null;
+      }
 
-    // Buscar perfil completo do usuário
-    const { data: profile } = await this.supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+      console.log('AuthService: Usuário encontrado:', user.email);
 
-    if (!profile) return null;
+      // Tentar buscar perfil completo do usuário
+      try {
+        const { data: profile, error: profileError } = await this.supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-    return {
-      id: user.id,
-      email: user.email!,
-      name: profile.name || undefined,
-      avatarUrl: profile.avatar_url || undefined,
-      role: profile.role as 'user' | 'admin',
-    };
+        if (profileError) {
+          console.warn('AuthService: Erro ao buscar perfil, usando dados básicos:', profileError);
+          // Retornar dados básicos se não conseguir buscar o perfil
+          return {
+            id: user.id,
+            email: user.email!,
+            name: user.user_metadata?.name || user.email?.split('@')[0],
+            avatarUrl: undefined,
+            role: 'user',
+          };
+        }
+
+        return {
+          id: user.id,
+          email: user.email!,
+          name: profile.name || user.user_metadata?.name || user.email?.split('@')[0],
+          avatarUrl: profile.avatar_url || undefined,
+          role: profile.role as 'user' | 'admin',
+        };
+      } catch (profileError) {
+        console.warn('AuthService: Falha ao buscar perfil, usando dados básicos:', profileError);
+        // Retornar dados básicos se houver erro na busca do perfil
+        return {
+          id: user.id,
+          email: user.email!,
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          avatarUrl: undefined,
+          role: 'user',
+        };
+      }
+    } catch (error) {
+      console.error('AuthService: Erro geral ao verificar usuário:', error);
+      return null;
+    }
   }
 
   /**
@@ -176,7 +217,7 @@ export class AuthService {
   /**
    * Cria o perfil do usuário após o registro
    */
-  private async createUserProfile(userId: string, name: string, email: string) {
+  private async createUserProfile(userId: string, name: string) {
     const { error } = await this.supabase
       .from('profiles')
       .insert({

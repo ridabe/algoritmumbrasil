@@ -10,40 +10,49 @@ export async function middleware(request: NextRequest) {
     request,
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  // Verifica se as variáveis de ambiente do Supabase estão configuradas
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // Obtém o usuário atual
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+
+  // Só tenta autenticar se as variáveis estão configuradas
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({
+              request,
+            })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
+    try {
+      // Obtém o usuário atual
+      const { data } = await supabase.auth.getUser()
+      user = data.user
+    } catch (error) {
+      console.warn('Erro ao verificar autenticação:', error)
+      // Continua sem usuário se houver erro
+    }
+  }
 
   const { pathname } = request.nextUrl
   
-  // Rotas públicas que não precisam de autenticação
-  const publicRoutes = ['/auth/login', '/auth/register', '/']
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
-  
   // Rotas protegidas que precisam de autenticação
-  const protectedRoutes = ['/financas']
+  const protectedRoutes = ['/sistemas/financeiro']
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   // Se usuário não está logado e tenta acessar rota protegida
@@ -56,14 +65,14 @@ export async function middleware(request: NextRequest) {
   // Se usuário está logado e tenta acessar páginas de auth, redireciona para dashboard
   if (user && (pathname === '/auth/login' || pathname === '/auth/register')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/financas'
+    url.pathname = '/sistemas/financeiro'
     return NextResponse.redirect(url)
   }
 
   // Se usuário está logado e acessa a página inicial, redireciona para dashboard
   if (user && pathname === '/') {
     const url = request.nextUrl.clone()
-    url.pathname = '/financas'
+    url.pathname = '/sistemas/financeiro'
     return NextResponse.redirect(url)
   }
 

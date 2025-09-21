@@ -99,7 +99,7 @@ export default function LoginPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
             <CardDescription>
-              Entre na sua conta para acessar o sistema financeiro
+              Entre na sua conta para acessar o Monetrix
             </CardDescription>
           </CardHeader>
           <CardContent>

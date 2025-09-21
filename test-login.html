@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Login - Algoritmum</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Teste de Login</h1>
+    <button onclick="testLogin()">Fazer Login de Teste</button>
+    <div id="result"></div>
+
+    <script>
+        // ATENÇÃO: Configure as variáveis abaixo com seus valores do .env.local
+        // Não commite este arquivo com valores reais!
+        const supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        
+        if (supabaseUrl === 'YOUR_SUPABASE_URL_HERE' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+            document.getElementById('result').innerHTML = '❌ Configure as variáveis supabaseUrl e supabaseKey antes de usar este teste.';
+            throw new Error('Configuração necessária');
+        }
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        async function testLogin() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Fazendo login...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: 'teste@algoritmum.com.br',
+                    password: '123456'
+                });
+                
+                if (error) {
+                    resultDiv.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+                    console.error('Erro no login:', error);
+                } else {
+                    resultDiv.innerHTML = `
+                        <p style="color: green;">Login realizado com sucesso!</p>
+                        <p>Usuário: ${data.user.email}</p>
+                        <p>ID: ${data.user.id}</p>
+                        <p>Sessão ativa: ${!!data.session}</p>
+                    `;
+                    console.log('Login bem-sucedido:', data);
+                    
+                    // Testar getCurrentUser
+                    const { data: userData, error: userError } = await supabase.auth.getUser();
+                    if (userError) {
+                        console.error('Erro ao buscar usuário:', userError);
+                    } else {
+                        console.log('Usuário atual:', userData);
+                    }
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `<p style="color: red;">Erro geral: ${err.message}</p>`;
+                console.error('Erro geral:', err);
+            }
+        }
+        
+        // Verificar se já existe uma sessão
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                document.getElementById('result').innerHTML = `
+                    <p style="color: blue;">Sessão existente encontrada!</p>
+                    <p>Usuário: ${session.user.email}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

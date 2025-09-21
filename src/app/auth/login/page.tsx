@@ -48,6 +48,19 @@ export default function LoginPage() {
   };
 
   /**
+   * Função para login de teste
+   */
+  const handleTestLogin = async () => {
+    try {
+      await signIn('teste@algoritmum.com.br', '123456');
+      toast.success('Login realizado com sucesso!');
+    } catch (error) {
+      console.error('Erro no login de teste:', error);
+      toast.error('Erro ao fazer login de teste');
+    }
+  };
+
+  /**
    * Manipula o envio do formulário
    */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,9 +94,11 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
+            <img 
+              src="/algoritmum-logo-compact.svg" 
+              alt="Algoritmum Brasil" 
+              className="h-12 w-auto"
+            />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
             Bem-vindo de volta
@@ -169,6 +184,18 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          <div className="mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleTestLogin}
+              disabled={loading}
+            >
+              Login de Teste
+            </Button>
+          </div>
 
           <div className="mt-6">
             <Separator className="my-4" />
