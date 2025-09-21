@@ -53,6 +53,14 @@ const nextConfig: NextConfig = {
   
   // Configuração webpack simplificada
   webpack: (config) => {
+    // Configuração para evitar problemas com PostCSS no Vercel
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      path: false,
+      os: false,
+    };
+    
     return config;
   },
 };

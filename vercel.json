@@ -10,7 +10,9 @@
     "env": {
       "SKIP_ENV_VALIDATION": "true",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "NEXT_DISABLE_LIGHTNINGCSS": "1",
+      "POSTCSS_CONFIG_PATH": "./postcss.config.mjs"
     }
   },
   "headers": [
