@@ -320,7 +320,7 @@ export default function ContactForm() {
                 <SelectValue placeholder="Selecione o tipo de serviço" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sistema-financeiro">Sistema Financeiro</SelectItem>
+                <SelectItem value="sistema-financeiro">Monetrix</SelectItem>
                 <SelectItem value="rpa-automacao">RPA e Automação</SelectItem>
                 <SelectItem value="data-ia">Data & IA</SelectItem>
                 <SelectItem value="sistema-personalizado">Sistema Personalizado</SelectItem>

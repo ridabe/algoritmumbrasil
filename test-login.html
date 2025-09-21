@@ -12,8 +12,15 @@
     <div id="result"></div>
 
     <script>
-        const supabaseUrl = 'https://fcwmqajcpupgflbsdymz.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd21xYWpjcHVwZ2ZsYnNkeW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNzY5NjIsImV4cCI6MjA3Mzk1Mjk2Mn0.mOb68sOde4T0hLsP8MO-9l62mvtIMGZe5iR22MgtIKQ';
+        // ATENÇÃO: Configure as variáveis abaixo com seus valores do .env.local
+        // Não commite este arquivo com valores reais!
+        const supabaseUrl = 'YOUR_SUPABASE_URL_HERE';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        
+        if (supabaseUrl === 'YOUR_SUPABASE_URL_HERE' || supabaseKey === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+            document.getElementById('result').innerHTML = '❌ Configure as variáveis supabaseUrl e supabaseKey antes de usar este teste.';
+            throw new Error('Configuração necessária');
+        }
         
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         

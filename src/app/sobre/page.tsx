@@ -51,7 +51,7 @@ export default function SobrePage() {
                   <p>
                     Fundada em 2024, a Algoritmum Brasil nasceu da visão de democratizar 
                     o acesso a tecnologias avançadas para empresas brasileiras. Começamos 
-                    com o desenvolvimento do nosso Sistema Financeiro, uma solução completa 
+                    com o desenvolvimento do Monetrix, uma solução completa 
                     para gestão de finanças pessoais e empresariais.
                   </p>
                   <p>

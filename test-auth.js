@@ -1,11 +1,18 @@
 // Script de teste para verificar autenticação Supabase
+require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 
 // Configuração do Supabase
-const supabaseUrl = 'https://fcwmqajcpupgflbsdymz.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd21xYWpjcHVwZ2ZsYnNkeW16Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODM3Njk2MiwiZXhwIjoyMDczOTUyOTYyfQ.wiZGDf9-u8PF7GqhTy8KJ6rBiveFbR9Xswl8WqFqqMY';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Variáveis de ambiente não encontradas');
+  console.error('Certifique-se de que NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY estão definidas no .env.local');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function confirmUser() {
   try {
@@ -23,15 +30,20 @@ async function confirmUser() {
       console.log('Usuário confirmado com sucesso:', data);
     }
     
-    // Tentar fazer login novamente
-    const supabaseClient = createClient(
-      'https://fcwmqajcpupgflbsdymz.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjd21xYWpjcHVwZ2ZsYnNkeW16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgzNzY5NjIsImV4cCI6MjA3Mzk1Mjk2Mn0.mOb68sOde4T0hLsP8MO-9l62mvtIMGZe5iR22MgtIKQ'
-    );
+    // Tentar fazer login novamente com cliente anônimo
+    const supabaseClient = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+    
+    const testEmail = process.env.TEST_USER_EMAIL || 'teste@algoritmum.com.br';
+    const testPassword = process.env.TEST_USER_PASSWORD;
+    
+    if (!testPassword) {
+      console.error('❌ TEST_USER_PASSWORD não definida no .env.local');
+      return;
+    }
     
     const { data: loginData, error: loginError } = await supabaseClient.auth.signInWithPassword({
-      email: 'teste@algoritmum.com.br',
-      password: '123456'
+      email: testEmail,
+      password: testPassword
     });
     
     if (loginError) {

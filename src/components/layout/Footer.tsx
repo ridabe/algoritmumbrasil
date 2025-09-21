@@ -6,7 +6,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Building2, Mail, Phone, MapPin, Github, Linkedin, Instagram } from 'lucide-react';
+import { Mail, Phone, MapPin, Github, Linkedin, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 
@@ -37,7 +37,7 @@ const footerSections: FooterSection[] = [
   {
     title: 'Sistemas',
     links: [
-      { label: 'Sistema Financeiro', href: '/sistemas/financeiro' },
+      { label: 'Monetrix', href: '/sistemas/financeiro' },
       { label: 'RPA Suite', href: '/sistemas/rpa' },
       { label: 'Data & IA Workbench', href: '/sistemas/data-ia' },
       { label: 'Todos os Sistemas', href: '/sistemas' }
@@ -95,9 +95,12 @@ export function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
             {/* Informações da Empresa */}
             <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center space-x-2 mb-4">
-                <Building2 className="h-8 w-8 text-primary" />
-                <span className="font-bold text-xl text-foreground">Algoritmum Brasil</span>
+              <Link href="/" className="flex items-center mb-4">
+                <img 
+                  src="/algoritmum-logo-compact.svg" 
+                  alt="Algoritmum Brasil" 
+                  className="h-8 w-auto"
+                />
               </Link>
               
               <p className="text-muted-foreground text-sm mb-6 max-w-md">

@@ -40,16 +40,16 @@ export default function SistemasPage() {
             </h2>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {/* Sistema Financeiro */}
-              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-green-200 dark:border-green-800">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Monetrix */}
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-blue-200 dark:border-blue-800">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <CardHeader className="relative">
-                  <div className="h-20 w-20 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-6">
-                    <BarChart3 className="h-10 w-10 text-green-600" />
+                  <div className="h-20 w-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                    <img src="/monetrix-icon.svg" alt="Monetrix" className="h-12 w-12" />
                   </div>
                   <div className="flex items-center justify-between mb-2">
-                    <CardTitle className="text-2xl">Sistema Financeiro</CardTitle>
-                    <Badge variant="default" className="bg-green-600 hover:bg-green-700">
+                    <CardTitle className="text-2xl">Monetrix</CardTitle>
+                    <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
                       Ativo
                     </Badge>
                   </div>
@@ -62,21 +62,21 @@ export default function SistemasPage() {
                   
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <Shield className="h-4 w-4 mr-2 text-green-600" />
+                      <Shield className="h-4 w-4 mr-2 text-blue-600" />
                       Controle de Contas e Transações
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <Shield className="h-4 w-4 mr-2 text-green-600" />
+                      <Shield className="h-4 w-4 mr-2 text-blue-600" />
                       Metas e Planejamento Financeiro
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <Shield className="h-4 w-4 mr-2 text-green-600" />
+                      <Shield className="h-4 w-4 mr-2 text-blue-600" />
                       Relatórios e Análises Detalhadas
                     </div>
                   </div>
                   
                   <Link href="/sistemas/financeiro">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 group-hover:scale-105 transition-all">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 group-hover:scale-105 transition-all">
                       Acessar Sistema
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>

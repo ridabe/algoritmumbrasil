@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, Sun, Moon, Building2 } from 'lucide-react';
+import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -37,10 +37,10 @@ interface SystemItem {
  */
 const systems: SystemItem[] = [
   {
-    name: 'Sistema Financeiro',
+    name: 'Monetrix',
     slug: 'financeiro',
     description: 'Gestão completa de finanças pessoais e empresariais',
-    icon: '💰',
+    icon: '/monetrix-icon.svg',
     status: 'active'
   },
   {
@@ -102,9 +102,12 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Building2 className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl text-foreground">Algoritmum Brasil</span>
+          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <img 
+              src="/algoritmum-logo-compact.svg" 
+              alt="Algoritmum Brasil" 
+              className="h-10 w-auto"
+            />
           </Link>
 
           {/* Menu Desktop */}
@@ -148,7 +151,11 @@ export function Navbar() {
                           href={`/sistemas/${system.slug}`}
                           className="flex items-start space-x-3 p-3 rounded-md hover:bg-accent transition-colors"
                         >
-                          <span className="text-2xl">{system.icon}</span>
+                          {typeof system.icon === 'string' && system.icon.startsWith('/') ? (
+                              <img src={system.icon} alt={system.name} className="w-6 h-6" />
+                            ) : (
+                              <span className="text-2xl">{system.icon}</span>
+                            )}
                           <div className="flex-1">
                             <p className="font-medium text-sm">{system.name}</p>
                             <p className="text-xs text-muted-foreground mt-1">{system.description}</p>

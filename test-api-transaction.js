@@ -17,9 +17,17 @@ async function testTransactionAPI() {
   try {
     // 1. Login
     console.log('1. Fazendo login...');
+    const testEmail = process.env.TEST_USER_EMAIL || 'usuario.teste@gmail.com';
+    const testPassword = process.env.TEST_USER_PASSWORD;
+    
+    if (!testPassword) {
+      console.error('❌ TEST_USER_PASSWORD não definida no .env.local');
+      return;
+    }
+    
     const { data: authData, error: loginError } = await supabase.auth.signInWithPassword({
-      email: 'usuario.teste@gmail.com',
-      password: 'teste123'
+      email: testEmail,
+      password: testPassword
     });
     
     if (loginError) {

@@ -139,15 +139,15 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {/* Sistema Financeiro */}
-              <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {/* Monetrix */}
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <CardHeader className="relative">
-                  <div className="h-16 w-16 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
-                    <BarChart3 className="h-8 w-8 text-green-600" />
+                  <div className="h-16 w-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mb-4">
+                    <img src="/monetrix-icon.svg" alt="Monetrix" className="h-10 w-10" />
                   </div>
-                  <CardTitle className="text-xl">Sistema Financeiro</CardTitle>
-                  <Badge variant="default" className="w-fit">Disponível</Badge>
+                  <CardTitle className="text-xl">Monetrix</CardTitle>
+                  <Badge variant="default" className="w-fit bg-blue-600 hover:bg-blue-700">Disponível</Badge>
                 </CardHeader>
                 <CardContent className="relative">
                   <CardDescription className="text-base mb-6">
@@ -155,7 +155,7 @@ export default function Home() {
                     controle de fluxo de caixa e relatórios inteligentes.
                   </CardDescription>
                   <Link href="/sistemas/financeiro">
-                    <Button className="w-full group-hover:bg-green-600 transition-colors">
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-colors">
                       Acessar Sistema
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>

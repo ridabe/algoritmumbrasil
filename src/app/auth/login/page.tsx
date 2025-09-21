@@ -94,9 +94,11 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">A</span>
-            </div>
+            <img 
+              src="/algoritmum-logo-compact.svg" 
+              alt="Algoritmum Brasil" 
+              className="h-12 w-auto"
+            />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
             Bem-vindo de volta
