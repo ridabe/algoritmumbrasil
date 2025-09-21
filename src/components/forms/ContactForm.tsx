@@ -315,7 +315,7 @@ export default function ContactForm() {
           {/* Tipo de Serviço */}
           <div className="space-y-2">
             <Label htmlFor="service">Tipo de Serviço *</Label>
-            <Select value={formData.service} onValueChange={(value) => updateField('service', value)}>
+            <Select value={formData.service} onValueChange={(value: string) => updateField('service', value)}>
               <SelectTrigger className={errors.service ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Selecione o tipo de serviço" />
               </SelectTrigger>
@@ -380,7 +380,7 @@ export default function ContactForm() {
             <Checkbox
               id="terms"
               checked={formData.acceptTerms}
-              onCheckedChange={(checked) => updateField('acceptTerms', !!checked)}
+              onCheckedChange={(checked: boolean) => updateField('acceptTerms', !!checked)}
               className={errors.acceptTerms ? 'border-red-500' : ''}
             />
             <div className="grid gap-1.5 leading-none">
