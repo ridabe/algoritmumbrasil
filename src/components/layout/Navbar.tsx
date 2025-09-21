@@ -68,6 +68,11 @@ const systems: SystemItem[] = [
  */
 const navItems: NavItem[] = [
   {
+    label: 'Home',
+    href: '/',
+    isActive: (pathname) => pathname === '/'
+  },
+  {
     label: 'Sobre a Empresa',
     href: '/sobre',
     isActive: (pathname) => pathname === '/sobre'
@@ -102,28 +107,28 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border sticky top-0 z-50">
+    <nav className="bg-background border-b border-border/50 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
-              src="/algoritmum-logo-compact.svg" 
+              src="/algoritmum-logo.svg" 
               alt="Algoritmum Brasil" 
-              className="h-10 w-auto"
+              className="h-10 w-auto" 
             />
           </Link>
 
           {/* Menu Desktop */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-accent/50 ${
                   isActiveRoute(item)
-                    ? 'text-primary border-b-2 border-primary pb-1'
-                    : 'text-muted-foreground'
+                    ? 'text-primary bg-primary/10 shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {item.label}
@@ -135,19 +140,22 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-accent/50 ${
                     pathname.startsWith('/sistemas')
-                      ? 'text-primary border-b-2 border-primary pb-1'
-                      : 'text-muted-foreground'
+                      ? 'text-primary bg-primary/10 shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Sistemas
-                  <ChevronDown className="ml-1 h-4 w-4" />
+                  <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuContent align="end" className="w-96 p-0 shadow-xl border-0 bg-background opacity-100">
+                <div className="p-4 border-b border-border/50">
+                  <h3 className="text-sm font-semibold text-foreground mb-1">Nossos Sistemas Próprios</h3>
+                  <p className="text-xs text-muted-foreground">Soluções desenvolvidas internamente</p>
+                </div>
                 <div className="p-2">
-                  <p className="text-sm text-muted-foreground mb-3">Nossos Sistemas Próprios</p>
                   {systems.map((system) => (
                     <DropdownMenuItem key={system.slug} asChild className="p-0">
                       {system.status === 'active' ? (
@@ -182,16 +190,18 @@ export function Navbar() {
             </DropdownMenu>
 
             {/* Toggle Tema */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="text-muted-foreground hover:text-primary"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Alternar tema</span>
-            </Button>
+            <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-border/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="h-10 w-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
+              >
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Alternar tema</span>
+              </Button>
+            </div>
           </div>
 
           {/* Menu Mobile */}
@@ -200,7 +210,7 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-muted-foreground hover:text-primary"
+              className="h-10 w-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
             >
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -210,9 +220,9 @@ export function Navbar() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(!isOpen)}
-              className="text-muted-foreground hover:text-primary"
+              className="h-10 w-10 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               <span className="sr-only">Menu</span>
             </Button>
           </div>
@@ -220,16 +230,16 @@ export function Navbar() {
 
         {/* Menu Mobile Expandido */}
         {isOpen && (
-          <div className="md:hidden border-t border-border">
-            <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="md:hidden border-t border-border/50 bg-background">
+            <div className="px-4 pt-4 pb-6 space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`block px-3 py-2 text-base font-medium rounded-md transition-colors ${
+                  className={`block px-4 py-3 text-base font-medium rounded-lg transition-all duration-200 ${
                     isActiveRoute(item)
-                      ? 'text-primary bg-accent'
-                      : 'text-muted-foreground hover:text-primary hover:bg-accent'
+                      ? 'text-primary bg-primary/10 shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -238,30 +248,41 @@ export function Navbar() {
               ))}
               
               {/* Sistemas Mobile */}
-              <div className="px-3 py-2">
-                <p className="text-sm font-medium text-foreground mb-2">Sistemas</p>
-                {systems.map((system) => (
-                  system.status === 'active' ? (
-                    <Link
-                      key={system.slug}
-                      href={`/sistemas/${system.slug}`}
-                      className="flex items-center space-x-3 px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-accent rounded-md transition-colors"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <span>{system.icon}</span>
-                      <span>{system.name}</span>
-                    </Link>
-                  ) : (
-                    <div
-                      key={system.slug}
-                      className="flex items-center space-x-3 px-3 py-2 text-sm text-muted-foreground opacity-50 cursor-not-allowed"
-                    >
-                      <span>{system.icon}</span>
-                      <span>{system.name}</span>
-                      <span className="text-xs text-amber-600">(Em desenvolvimento)</span>
-                    </div>
-                  )
-                ))}
+              <div className="mt-6 pt-4 border-t border-border/50">
+                <h3 className="px-4 py-2 text-sm font-semibold text-foreground mb-2">Sistemas</h3>
+                <div className="space-y-1">
+                  {systems.map((system) => (
+                    system.status === 'active' ? (
+                      <Link
+                        key={system.slug}
+                        href={`/sistemas/${system.slug}`}
+                        className="flex items-center space-x-3 mx-2 px-4 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 rounded-lg transition-all duration-200"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        {typeof system.icon === 'string' && system.icon.startsWith('/') ? (
+                          <img src={system.icon} alt={system.name} className="w-5 h-5" />
+                        ) : (
+                          <span className="text-lg">{system.icon}</span>
+                        )}
+                        <div className="flex-1">
+                          <span className="font-medium">{system.name}</span>
+                          <p className="text-xs text-muted-foreground mt-0.5">{system.description}</p>
+                        </div>
+                      </Link>
+                    ) : (
+                      <div
+                        key={system.slug}
+                        className="flex items-center space-x-3 mx-2 px-4 py-3 text-sm text-muted-foreground opacity-50 cursor-not-allowed rounded-lg"
+                      >
+                        <span className="text-lg">{system.icon}</span>
+                        <div className="flex-1">
+                          <span className="font-medium">{system.name}</span>
+                          <p className="text-xs text-amber-600 mt-0.5">Em desenvolvimento</p>
+                        </div>
+                      </div>
+                    )
+                  ))}
+                </div>
               </div>
             </div>
           </div>
