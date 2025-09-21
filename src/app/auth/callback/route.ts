@@ -20,7 +20,7 @@ interface CookieOptions {
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = searchParams.get('next') ?? '/financas';
+  const next = searchParams.get('next') ?? '/sistemas/financeiro';
 
   if (code) {
     const cookieStore = await cookies();
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
           setAll(cookiesToSet) {
             try {
               cookiesToSet.forEach(({ name, value, options }) => {
-                cookieStore.set({ name, value, ...options });
+                cookieStore.set(name, value, options);
               });
             } catch (error) {
               // Os cookies podem não ser definidos em alguns casos

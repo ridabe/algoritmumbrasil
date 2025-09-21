@@ -14,10 +14,15 @@ import { useState, useEffect } from 'react';
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     // Verifica se estamos no cliente (não no servidor)
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !mounted) {
       return;
     }
 
@@ -38,7 +43,12 @@ export function useMediaQuery(query: string): boolean {
     return () => {
       media.removeEventListener('change', listener);
     };
-  }, [query]);
+  }, [query, mounted]);
+
+  // Retorna false durante a hidratação para evitar mismatch
+  if (!mounted) {
+    return false;
+  }
 
   return matches;
 }

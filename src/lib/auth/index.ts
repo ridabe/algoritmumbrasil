@@ -15,10 +15,14 @@ export const supabaseClient = supabase;
  * Cria um cliente Supabase para componentes do cliente
  */
 export const createSupabaseClient = () => {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Variáveis de ambiente do Supabase não configuradas');
+  }
+  
+  return createBrowserClient(supabaseUrl, supabaseAnonKey);
 };
 
 // Tipos de usuário

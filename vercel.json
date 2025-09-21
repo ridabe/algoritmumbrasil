@@ -1,17 +1,19 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "pnpm run build",
-  "installCommand": "pnpm install --frozen-lockfile",
   "functions": {
-    "src/app/**/*.tsx": {
+    "app/api/**/*.ts": {
       "maxDuration": 30
     }
   },
+  "installCommand": "pnpm install --frozen-lockfile --prod=false",
+  "buildCommand": "pnpm run build",
+  "devCommand": "pnpm run dev",
+  "framework": "nextjs",
+  "regions": ["gru1"],
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "true",
       "NEXT_TELEMETRY_DISABLED": "1",
-      "NODE_ENV": "production"
+      "NODE_OPTIONS": "--max-old-space-size=4096"
     }
   },
   "headers": [
