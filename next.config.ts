@@ -8,12 +8,20 @@ const nextConfig: NextConfig = {
   },
   
   // Pacotes externos para o servidor
-  serverExternalPackages: ['@supabase/supabase-js'],
+  serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   
   // Configurações experimentais para compatibilidade com Vercel
   experimental: {
     // Desabilita otimizações CSS que podem causar problemas no Vercel
     optimizeCss: false,
+    // Configurações para Edge Runtime
+    serverComponentsExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
+  },
+  
+  // Força o uso do PostCSS tradicional
+  compiler: {
+    // Remove console.log em produção
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   
   // Configuração CSS para compatibilidade com Vercel
@@ -82,6 +90,12 @@ const nextConfig: NextConfig = {
         'postcss/lib/postcss': 'postcss',
       };
     }
+
+    // Desabilitar completamente lightningcss
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'lightningcss': false,
+    };
 
     // Ignorar módulos problemáticos no Vercel
     config.externals = config.externals || [];
