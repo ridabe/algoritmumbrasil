@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   // Rotas protegidas que precisam de autenticação
-  const protectedRoutes = ['/financas']
+  const protectedRoutes = ['/sistemas/financeiro']
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
 
   // Se usuário não está logado e tenta acessar rota protegida
@@ -65,14 +65,14 @@ export async function middleware(request: NextRequest) {
   // Se usuário está logado e tenta acessar páginas de auth, redireciona para dashboard
   if (user && (pathname === '/auth/login' || pathname === '/auth/register')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/financas'
+    url.pathname = '/sistemas/financeiro'
     return NextResponse.redirect(url)
   }
 
   // Se usuário está logado e acessa a página inicial, redireciona para dashboard
   if (user && pathname === '/') {
     const url = request.nextUrl.clone()
-    url.pathname = '/financas'
+    url.pathname = '/sistemas/financeiro'
     return NextResponse.redirect(url)
   }
 

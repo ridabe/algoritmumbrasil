@@ -48,6 +48,19 @@ export default function LoginPage() {
   };
 
   /**
+   * Função para login de teste
+   */
+  const handleTestLogin = async () => {
+    try {
+      await signIn('teste@algoritmum.com.br', '123456');
+      toast.success('Login realizado com sucesso!');
+    } catch (error) {
+      console.error('Erro no login de teste:', error);
+      toast.error('Erro ao fazer login de teste');
+    }
+  };
+
+  /**
    * Manipula o envio do formulário
    */
   const handleSubmit = async (e: React.FormEvent) => {
@@ -169,6 +182,18 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
+
+          <div className="mt-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleTestLogin}
+              disabled={loading}
+            >
+              Login de Teste
+            </Button>
+          </div>
 
           <div className="mt-6">
             <Separator className="my-4" />

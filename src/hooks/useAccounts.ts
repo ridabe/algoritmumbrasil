@@ -4,6 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { useDataContext, useDataListener } from '@/contexts/data-context';
 import { AccountsService } from '@/lib/services/accounts';
 import type {
   Account,
@@ -45,6 +47,8 @@ interface UseAccountsReturn extends UseAccountsState {
  * Hook para gerenciar contas bancárias
  */
 export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn {
+  const { user } = useAuth();
+  const { notifyAccountChange } = useDataContext();
   const [state, setState] = useState<UseAccountsState>({
     accounts: [],
     summary: null,
@@ -105,6 +109,8 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
 
       const newAccount = await AccountsService.createAccount(data);
 
+      // Notificar sobre a mudança
+      notifyAccountChange('create', newAccount.id, newAccount);
       
       // Atualizar lista local
       updateState({
@@ -126,7 +132,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       });
       return null;
     }
-  }, [state.accounts, updateState]);
+  }, [state.accounts, updateState, notifyAccountChange]);
 
   /**
    * Atualiza uma conta existente
@@ -139,6 +145,9 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       updateState({ loading: true, error: null });
       
       const updatedAccount = await AccountsService.updateAccount(id, data);
+      
+      // Notificar sobre a mudança
+      notifyAccountChange('update', id, updatedAccount);
       
       // Atualizar lista local
       const updatedAccounts = state.accounts.map(account =>
@@ -164,7 +173,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       });
       return null;
     }
-  }, [state.accounts, updateState]);
+  }, [state.accounts, updateState, notifyAccountChange]);
 
   /**
    * Exclui uma conta
@@ -174,6 +183,9 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       updateState({ loading: true, error: null });
       
       await AccountsService.deleteAccount(id);
+      
+      // Notificar sobre a mudança
+      notifyAccountChange('delete', id);
       
       // Remover da lista local
       const filteredAccounts = state.accounts.filter(account => account.id !== id);
@@ -196,7 +208,7 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
       });
       return false;
     }
-  }, [state.accounts, state.totalCount, updateState]);
+  }, [state.accounts, state.totalCount, updateState, notifyAccountChange]);
 
   /**
    * Atualiza o saldo de uma conta
@@ -295,6 +307,16 @@ export function useAccounts(initialFilters?: AccountFilters): UseAccountsReturn 
     refreshData();
   }, [refreshData]);
 
+  // Escutar mudanças de dados para atualização automática
+  useDataListener('account', () => {
+    refreshData();
+  });
+
+  // Escutar mudanças de transações que podem afetar saldos das contas
+  useDataListener('transaction', () => {
+    refreshData();
+  });
+
   return {
     // Estado
     accounts: state.accounts,
@@ -348,6 +370,16 @@ export function useFinancialSummary() {
   useEffect(() => {
     fetchSummary();
   }, [fetchSummary]);
+
+  // Escutar mudanças de contas para atualização automática
+  useDataListener('account', () => {
+    fetchSummary();
+  });
+
+  // Escutar mudanças de transações que podem afetar o resumo financeiro
+  useDataListener('transaction', () => {
+    fetchSummary();
+  });
 
   return {
     summary,

@@ -38,6 +38,7 @@ import {
 } from '@/components/ui/select';
 import { TransactionModal } from '@/components/modals/TransactionModal';
 import { useTransactions, useTransactionsSummary } from '@/hooks/useTransactions';
+import { useRequireAuth } from '@/contexts/auth-context';
 import {
   Transaction,
   TransactionType,
@@ -96,6 +97,9 @@ const getAmountColor = (type: TransactionType) => {
 };
 
 export default function TransacoesPage() {
+  // Verificar autenticação
+  useRequireAuth();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | TransactionType>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -313,8 +317,8 @@ export default function TransacoesPage() {
                     {formatDate(transaction.transaction_date)}
                   </TableCell>
                   <TableCell>{transaction.description}</TableCell>
-                  <TableCell>{transaction.category_id}</TableCell>
-                  <TableCell>{transaction.account_id}</TableCell>
+                  <TableCell>{transaction.category_name}</TableCell>
+                  <TableCell>{transaction.account_name}</TableCell>
                   <TableCell>
                     <Badge variant="outline">
                       {PAYMENT_METHOD_LABELS[transaction.payment_method]}

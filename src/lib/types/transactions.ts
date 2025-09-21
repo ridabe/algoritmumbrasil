@@ -72,6 +72,7 @@ export interface CreateTransactionData {
   type: TransactionType;
   payment_method: PaymentMethod;
   transaction_date: string;
+  date?: string; // Campo alternativo para compatibilidade com o banco
   due_date?: string;
   notes?: string;
   tags?: string[];

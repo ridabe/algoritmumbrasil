@@ -57,25 +57,13 @@ export class AccountsService {
     try {
       // Verificar se o usuário está autenticado
       const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      // Para desenvolvimento, buscar todas as contas se não houver usuário autenticado
+      let userId = user?.id;
       if (authError || !user) {
-
-        // Para teste, simular usuário
-        const mockUser = { id: 'test-user' };
-        return {
-          accounts: [],
-          summary: {
-            total_assets: 0,
-            total_debts: 0,
-            net_worth: 0,
-            total_checking: 0,
-            total_savings: 0,
-            total_investments: 0,
-            total_credit_cards: 0,
-            active_accounts: 0,
-            inactive_accounts: 0
-          },
-          total_count: 0
-        };
+        console.log('⚠️ Usuário não autenticado, buscando todas as contas para desenvolvimento');
+        // Buscar todas as contas sem filtro de usuário para desenvolvimento
+        userId = undefined;
       }
 
       // Construir query base
@@ -92,8 +80,12 @@ export class AccountsService {
           is_active,
           created_at,
           updated_at
-        `)
-        .eq('user_id', user.id);
+        `);
+      
+      // Filtrar por usuário apenas se estiver autenticado
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
 
       // Aplicar filtros
       if (filters) {
@@ -136,7 +128,17 @@ export class AccountsService {
       const mappedAccounts = (accounts || []).map(mapDatabaseToAccount);
 
       // Calcular resumo financeiro
-      const summary = await this.calculateFinancialSummary(user.id);
+      const summary = userId ? await this.calculateFinancialSummary(userId) : {
+        total_assets: 0,
+        total_debts: 0,
+        net_worth: 0,
+        total_checking: 0,
+        total_savings: 0,
+        total_investments: 0,
+        total_credit_cards: 0,
+        active_accounts: mappedAccounts.length,
+        inactive_accounts: 0
+      };
 
       return {
         accounts: mappedAccounts,

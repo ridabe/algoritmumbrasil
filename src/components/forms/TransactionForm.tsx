@@ -108,9 +108,14 @@ export function TransactionForm({
   isEditing = false,
   loading = false
 }: TransactionFormProps) {
-  const { accounts } = useAccounts();
+  const { accounts, fetchAccounts } = useAccounts();
   const [tagInput, setTagInput] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>(initialData?.tags || []);
+
+  // Carregar contas ao montar o componente
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
@@ -168,13 +173,18 @@ export function TransactionForm({
    */
   const handleSubmit = async (data: TransactionFormData) => {
     try {
+      console.log('📝 Dados recebidos do formulário:', JSON.stringify(data, null, 2));
+      
       const submitData = {
         ...data,
+        status: 'confirmed', // Adicionar status obrigatório
         transaction_date: data.transaction_date.toISOString(),
         due_date: data.due_date?.toISOString(),
         recurrence_end_date: data.recurrence_end_date?.toISOString(),
         tags: selectedTags
       };
+      
+      console.log('🚀 Dados preparados para envio:', JSON.stringify(submitData, null, 2));
 
       await onSubmit(submitData);
     } catch (error) {
@@ -264,7 +274,7 @@ export function TransactionForm({
                 <SelectContent>
                   {accounts.map((account) => (
                     <SelectItem key={account.id} value={account.id}>
-                      {account.name} - {account.bank}
+                      {account.name} - {account.bank || 'Sem banco'}
                     </SelectItem>
                   ))}
                 </SelectContent>

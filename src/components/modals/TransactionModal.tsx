@@ -54,18 +54,29 @@ export function TransactionModal({
 
   /**
    * Manipula o envio do formulário
+   * - Garante que somente exibimos sucesso e fechamos o modal quando a operação retornar um resultado válido
+   * - Evita falso positivo quando o hook retorna null em caso de erro
    */
   const handleSubmit = async (data: CreateTransactionData | UpdateTransactionData) => {
     setLoading(true);
     try {
       if (isEditing && transaction) {
-        await updateTransaction(transaction.id, data as UpdateTransactionData);
+        const updated = await updateTransaction(transaction.id, data as UpdateTransactionData);
+        if (!updated) {
+          toast.error('Erro ao atualizar transação. Verifique os campos e tente novamente.');
+          return;
+        }
         toast.success('Transação atualizada com sucesso!');
+        onOpenChange(false);
       } else {
-        await createTransaction(data as CreateTransactionData);
+        const created = await createTransaction(data as CreateTransactionData);
+        if (!created) {
+          toast.error('Erro ao criar transação. Verifique os campos e tente novamente.');
+          return;
+        }
         toast.success('Transação criada com sucesso!');
+        onOpenChange(false);
       }
-      onOpenChange(false);
     } catch (error) {
       console.error('Erro ao salvar transação:', error);
       toast.error(

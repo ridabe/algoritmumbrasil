@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
+import { useDataContext, useDataListener } from '@/contexts/data-context';
 import { TransactionService } from '@/lib/services/transactions';
 import {
   Transaction,
@@ -45,6 +46,7 @@ export function useTransactions(
   autoLoad: boolean = true
 ): UseTransactionsReturn {
   const { user } = useAuth();
+  const { notifyTransactionChange } = useDataContext();
   const [transactions, setTransactions] = useState<TransactionWithDetails[]>([]);
   const [summary, setSummary] = useState<TransactionSummary | null>(null);
   const [loading, setLoading] = useState(false);
@@ -83,14 +85,24 @@ export function useTransactions(
   const createTransaction = useCallback(async (
     data: CreateTransactionData
   ): Promise<Transaction | null> => {
+    console.log('=== HOOK useTransactions - createTransaction ===');
+    console.log('User object:', user);
+    console.log('User ID:', user?.id);
+    console.log('Data recebida:', JSON.stringify(data, null, 2));
+    
     if (!user?.id) {
+      console.error('❌ Usuário não autenticado - user:', user);
       setError('Usuário não autenticado');
       return null;
     }
 
     try {
       setError(null);
+      console.log('✅ Chamando TransactionService.createTransaction com userId:', user.id);
       const newTransaction = await TransactionService.createTransaction(user.id, data);
+      
+      // Notificar sobre a mudança
+      notifyTransactionChange('create', newTransaction.id, newTransaction);
       
       // Recarregar dados para manter sincronização
       await loadTransactions();
@@ -102,7 +114,7 @@ export function useTransactions(
       console.error('Erro ao criar transação:', err);
       return null;
     }
-  }, [user?.id, loadTransactions]);
+  }, [user?.id, loadTransactions, notifyTransactionChange]);
 
   /**
    * Atualiza uma transação existente
@@ -120,6 +132,9 @@ export function useTransactions(
       setError(null);
       const updatedTransaction = await TransactionService.updateTransaction(id, user.id, data);
       
+      // Notificar sobre a mudança
+      notifyTransactionChange('update', id, updatedTransaction);
+      
       // Recarregar dados para manter sincronização
       await loadTransactions();
       
@@ -130,7 +145,7 @@ export function useTransactions(
       console.error('Erro ao atualizar transação:', err);
       return null;
     }
-  }, [user?.id, loadTransactions]);
+  }, [user?.id, loadTransactions, notifyTransactionChange]);
 
   /**
    * Exclui uma transação
@@ -145,6 +160,9 @@ export function useTransactions(
       setError(null);
       await TransactionService.deleteTransaction(id, user.id);
       
+      // Notificar sobre a mudança
+      notifyTransactionChange('delete', id);
+      
       // Recarregar dados para manter sincronização
       await loadTransactions();
       
@@ -155,7 +173,7 @@ export function useTransactions(
       console.error('Erro ao excluir transação:', err);
       return false;
     }
-  }, [user?.id, loadTransactions]);
+  }, [user?.id, loadTransactions, notifyTransactionChange]);
 
   /**
    * Atualiza os filtros e recarrega as transações
@@ -199,6 +217,20 @@ export function useTransactions(
     }
   }, [autoLoad, user?.id, loadTransactions]);
 
+  // Escutar mudanças de dados para atualização automática
+  useDataListener('transaction', () => {
+    if (user && autoLoad) {
+      loadTransactions();
+    }
+  });
+
+  // Escutar mudanças de contas que podem afetar transações
+  useDataListener('account', () => {
+    if (user && autoLoad) {
+      loadTransactions();
+    }
+  });
+
   return {
     // Estado
     transactions,
@@ -237,6 +269,20 @@ export function useTransactionsSummary(
   const [summary, setSummary] = useState<TransactionSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Escutar mudanças de dados para atualização automática
+  useDataListener('transaction', () => {
+    if (user?.id) {
+      loadSummary();
+    }
+  });
+
+  // Escutar mudanças de contas que podem afetar o resumo
+  useDataListener('account', () => {
+    if (user?.id) {
+      loadSummary();
+    }
+  });
 
   const loadSummary = useCallback(async () => {
     if (!user?.id) return;
@@ -311,6 +357,13 @@ export function useTransactionsByCategory(
     }
   }, [user?.id, categoryId, loadTransactions]);
 
+  // Escutar mudanças de transações para atualização automática
+  useDataListener('transaction', () => {
+    if (user?.id && categoryId) {
+      loadTransactions();
+    }
+  });
+
   return {
     transactions,
     loading,
@@ -359,6 +412,20 @@ export function useTransactionsByAccount(
       loadTransactions();
     }
   }, [user?.id, accountId, loadTransactions]);
+
+  // Escutar mudanças de transações para atualização automática
+  useDataListener('transaction', () => {
+    if (user?.id && accountId) {
+      loadTransactions();
+    }
+  });
+
+  // Escutar mudanças de contas para atualização automática
+  useDataListener('account', () => {
+    if (user?.id && accountId) {
+      loadTransactions();
+    }
+  });
 
   return {
     transactions,

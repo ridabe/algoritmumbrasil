@@ -34,7 +34,7 @@ export interface DashboardData {
  * Busca KPIs, evolução mensal e distribuição por categorias
  */
 export function useDashboard() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -195,8 +195,15 @@ export function useDashboard() {
   }, [user?.id]);
 
   useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+    // Só carrega dados se a autenticação estiver completa e o usuário estiver logado
+    if (!authLoading && user) {
+      loadDashboardData();
+    } else if (!authLoading && !user) {
+      // Se não há usuário logado, define loading como false
+      setLoading(false);
+      setError('Usuário não autenticado');
+    }
+  }, [loadDashboardData, authLoading, user]);
 
   return {
     data,

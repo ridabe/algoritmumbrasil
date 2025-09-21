@@ -7,6 +7,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService, type AuthUser } from '@/lib/auth';
+import { supabase } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -34,10 +35,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Verificar usuário atual ao inicializar
     const initializeAuth = async () => {
       try {
+        console.log('AuthContext: Inicializando autenticação...');
+        
+        // Primeiro, verificar se há uma sessão ativa
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.log('AuthContext: Erro ao obter sessão:', sessionError.message);
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
+        if (!session) {
+          console.log('AuthContext: Nenhuma sessão ativa encontrada');
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('AuthContext: Sessão ativa encontrada, obtendo dados do usuário...');
         const currentUser = await authService.getCurrentUser();
+        console.log('AuthContext: Usuário atual obtido:', currentUser);
         setUser(currentUser);
       } catch (error) {
-        console.error('Erro ao verificar usuário:', error);
+        console.error('AuthContext: Erro ao inicializar autenticação:', error);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -47,6 +70,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Escutar mudanças no estado de autenticação
     const { data: { subscription } } = authService.onAuthStateChange((user) => {
+      console.log('Mudança no estado de auth:', user);
       setUser(user);
       setLoading(false);
     });

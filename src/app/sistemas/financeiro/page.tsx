@@ -20,11 +20,19 @@ import {
   RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/auth-context';
+import { useEffect } from 'react';
 
 export default function FinancasPage() {
+  const { user, loading: authLoading } = useAuth();
   const { data, loading, error, refetch } = useDashboard();
 
-  if (loading) {
+  // Debug: verificar estado da autenticação
+  useEffect(() => {
+    console.log('Auth state:', { user, authLoading });
+  }, [user, authLoading]);
+
+  if (loading || authLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
