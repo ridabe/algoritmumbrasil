@@ -14,8 +14,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // Desabilita otimizações CSS que podem causar problemas no Vercel
     optimizeCss: false,
-    // Configurações para Edge Runtime
-    serverComponentsExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   },
   
   // Força o uso do PostCSS tradicional
@@ -70,45 +68,15 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
-  // Configuração webpack robusta para Vercel
-  webpack: (config, { dev, isServer }) => {
-    // Configuração para evitar problemas com PostCSS no Vercel
+  // Configuração webpack simplificada
+  webpack: (config) => {
+    // Configuração mínima para Supabase no Edge Runtime
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
       path: false,
       os: false,
-      crypto: false,
-      stream: false,
-      util: false,
     };
-
-    // Configuração específica para PostCSS no ambiente serverless
-    if (!dev && !isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        'postcss/lib/postcss': 'postcss',
-      };
-    }
-
-    // Desabilitar completamente lightningcss
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'lightningcss': false,
-    };
-
-    // Ignorar módulos problemáticos no Vercel
-    config.externals = config.externals || [];
-    if (Array.isArray(config.externals)) {
-      config.externals.push({
-        'lightningcss': 'lightningcss',
-        'lightningcss-linux-x64-gnu': 'lightningcss-linux-x64-gnu',
-        'lightningcss-linux-x64-musl': 'lightningcss-linux-x64-musl',
-        'lightningcss-darwin-x64': 'lightningcss-darwin-x64',
-        'lightningcss-darwin-arm64': 'lightningcss-darwin-arm64',
-        'lightningcss-win32-x64-msvc': 'lightningcss-win32-x64-msvc',
-      });
-    }
     
     return config;
   },

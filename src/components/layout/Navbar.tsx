@@ -16,7 +16,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from 'next-themes';
+// First install next-themes:
+// npm install next-themes
+// or
+// yarn add next-themes
+import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 
 interface NavItem {
   label: string;
