@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -63,6 +64,7 @@ export function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const supabase = createClient();
+  const { signOut } = useAuth();
 
   /**
    * Função para carregar dados do usuário
@@ -175,22 +177,10 @@ export function Header() {
    */
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) {
-        toast.error('Erro ao fazer logout', {
-          description: error.message,
-        });
-        return;
-      }
-
-      toast.success('Logout realizado com sucesso!');
-      router.push('/login');
-      router.refresh();
+      await signOut();
     } catch (error) {
-      toast.error('Erro inesperado', {
-        description: 'Tente novamente em alguns instantes.',
-      });
+      // O erro já é tratado no contexto de autenticação
+      console.error('Erro no logout:', error);
     }
   };
 

@@ -134,6 +134,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setLoading(true);
       await authService.signOut();
+      // Aguardar um pouco para o listener atualizar o estado
+      await new Promise(resolve => setTimeout(resolve, 100));
+      setUser(null); // Garantir que o usuário seja limpo
       toast.success('Logout realizado com sucesso!');
       router.push('/auth/login');
     } catch (error) {
