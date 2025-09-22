@@ -44,31 +44,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        {/* CDN Libraries for external dependencies */}
-        <script 
-          src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/index.min.js" 
-          defer
-        />
-        <script 
-          src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js" 
-          defer
-        />
-        <script 
-          src="https://cdn.jsdelivr.net/npm/clsx@2.1.0/dist/clsx.min.js" 
-          defer
-        />
-        <script 
-          src="https://cdn.jsdelivr.net/npm/lucide-react@0.344.0/dist/umd/lucide-react.js" 
-          defer
-        />
-        <script 
-          src="https://cdn.jsdelivr.net/npm/recharts@2.12.0/umd/Recharts.js" 
-          defer
-        />
-        <script 
-          src="https://cdn.jsdelivr.net/npm/zod@3.22.4/lib/index.umd.js" 
-          defer
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider
