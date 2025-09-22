@@ -1,0 +1,20 @@
+{
+  "name": "Algoritmum Brasil",
+  "short_name": "Algoritmum",
+  "description": "Soluções Tecnológicas Inovadoras",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/algoritmum-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}
