@@ -44,5 +44,5 @@ next-env.d.ts
 # Drizzle
 drizzle/
 
-# PostCSS duplicado
-postcss.config.js
+# Scripts Node.js (não devem ser servidos)
+scripts/

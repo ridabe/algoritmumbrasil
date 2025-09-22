@@ -47,7 +47,12 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="format-detection" content="telephone=no" />
-
+        <meta name="referrer" content="origin-when-cross-origin" />
+        <meta name="color-scheme" content="light dark" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider
