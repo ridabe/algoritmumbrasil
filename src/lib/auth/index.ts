@@ -128,8 +128,59 @@ export class AuthService {
           .single();
 
         if (profileError) {
-          console.warn('AuthService: Erro ao buscar perfil, usando dados básicos:', profileError);
-          // Retornar dados básicos se não conseguir buscar o perfil
+          console.warn('AuthService: Perfil não encontrado, tentando criar:', profileError);
+          
+          // Se o perfil não existe, criar automaticamente (útil para OAuth)
+          if (profileError.code === 'PGRST116') { // Nenhum resultado encontrado
+            console.log('AuthService: Criando perfil automaticamente para usuário OAuth');
+            const userName = user.user_metadata?.name || 
+                           user.user_metadata?.full_name || 
+                           user.email?.split('@')[0] || 
+                           'Usuário';
+            
+            try {
+              await this.createUserProfile(user.id, userName);
+              
+              // Tentar buscar o perfil novamente após criação
+              const { data: newProfile, error: newProfileError } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+              
+              if (newProfileError) {
+                console.error('AuthService: Erro ao buscar perfil recém-criado:', newProfileError);
+                // Retornar dados básicos se não conseguir buscar o perfil recém-criado
+                return {
+                  id: user.id,
+                  email: user.email!,
+                  name: userName,
+                  avatarUrl: undefined,
+                  role: 'user',
+                };
+              }
+              
+              return {
+                id: user.id,
+                email: user.email!,
+                name: newProfile.name || userName,
+                avatarUrl: newProfile.avatar_url || undefined,
+                role: newProfile.role as 'user' | 'admin',
+              };
+            } catch (createError) {
+              console.error('AuthService: Erro ao criar perfil automaticamente:', createError);
+              // Retornar dados básicos se não conseguir criar o perfil
+              return {
+                id: user.id,
+                email: user.email!,
+                name: userName,
+                avatarUrl: undefined,
+                role: 'user',
+              };
+            }
+          }
+          
+          // Para outros tipos de erro, retornar dados básicos
           return {
             id: user.id,
             email: user.email!,
@@ -219,9 +270,9 @@ export class AuthService {
   }
 
   /**
-   * Cria o perfil do usuário após o registro
+   * Cria o perfil do usuário após o registro ou login OAuth
    */
-  private async createUserProfile(userId: string, name: string) {
+  async createUserProfile(userId: string, name: string) {
     const { error } = await this.supabase
       .from('profiles')
       .insert({

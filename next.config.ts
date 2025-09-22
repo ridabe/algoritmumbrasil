@@ -10,11 +10,8 @@ const nextConfig: NextConfig = {
   // Pacotes externos para o servidor
   serverExternalPackages: ['@supabase/supabase-js', '@supabase/ssr'],
   
-  // Configurações experimentais para compatibilidade com Vercel
-  experimental: {
-    // Desabilita otimizações CSS que podem causar problemas no Vercel
-    optimizeCss: false,
-  },
+  // Configurações experimentais removidas para compatibilidade
+  // experimental: {},
   
   // Força o uso do PostCSS tradicional
   compiler: {
@@ -68,9 +65,31 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
   
-  // Configuração webpack simplificada
+  // Headers básicos de segurança
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          }
+        ]
+      }
+    ];
+  },
+  
+  // Configuração webpack mínima
   webpack: (config) => {
-    // Configuração mínima para Supabase no Edge Runtime
     config.resolve.fallback = {
       ...config.resolve.fallback,
       fs: false,
